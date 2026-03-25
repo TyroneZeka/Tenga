@@ -140,6 +140,18 @@ tenga:
   location:
     default-radius-km: 25
     max-radius-km: 100
+  payment:
+    ecocash:
+      api-url: ${ECOCASH_API_URL:https://api.ecocash.co.zw}
+      merchant-code: ${ECOCASH_MERCHANT_CODE}
+      pin: ${ECOCASH_PIN}
+      callback-url: ${ECOCASH_CALLBACK_URL}
+      mock: ${ECOCASH_MOCK:false}
+    innbucks:
+      api-url: ${INNBUCKS_API_URL:https://api.innbucks.co.zw}
+      api-key: ${INNBUCKS_API_KEY}
+      callback-url: ${INNBUCKS_CALLBACK_URL}
+      mock: ${INNBUCKS_MOCK:false}
   rate-limit:
     public-endpoints-per-minute: 100
     auth-endpoints-per-minute: 10

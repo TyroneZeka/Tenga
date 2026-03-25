@@ -46,7 +46,11 @@ public class SecurityConfig {
   };
 
   private static final String[] PUBLIC_POST_PATTERNS = {
-    "/api/v1/auth/register", "/api/v1/auth/login", "/api/v1/auth/refresh", "/api/v1/auth/otp/**"
+    "/api/v1/auth/register",
+    "/api/v1/auth/login",
+    "/api/v1/auth/refresh",
+    "/api/v1/auth/otp/**",
+    "/api/v1/payments/callbacks/**"
   };
 
   private final JwtService jwtService;
