@@ -1,0 +1,42 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/tenga_dev
+    username: tenga
+    password: tenga
+
+  jpa:
+    properties:
+      hibernate:
+        format_sql: true
+    show-sql: false
+
+  data:
+    redis:
+      url: redis://localhost:6379
+
+  kafka:
+    bootstrap-servers: localhost:9092
+
+  elasticsearch:
+    uris: http://localhost:9200
+
+  mail:
+    host: localhost
+    port: 1025   # MailHog / MailPit for local dev
+
+tenga:
+  jwt:
+    secret: dev-secret-key-must-be-at-least-256-bits-long-for-hs256-algorithm
+    access-token-expiry: 3600   # 1 hour for easier local development
+  s3:
+    bucket: tenga-dev
+    access-key: minioadmin
+    secret-key: minioadmin
+    endpoint: http://localhost:9000
+    region: us-east-1
+
+logging:
+  level:
+    com.tenga: DEBUG
+    org.hibernate.SQL: DEBUG
+    org.springframework.security: DEBUG
