@@ -14,6 +14,7 @@ import com.tenga.auth.model.enums.UserRole;
 import com.tenga.auth.repository.AuthUserRepository;
 import com.tenga.auth.repository.OtpCodeRepository;
 import com.tenga.auth.repository.RefreshTokenRepository;
+import com.tenga.common.event.OtpNotificationEvent;
 import com.tenga.common.exception.BusinessException;
 import com.tenga.common.exception.ConflictException;
 import jakarta.servlet.http.Cookie;
@@ -24,6 +25,7 @@ import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -39,21 +41,27 @@ public class AuthServiceImpl implements AuthService {
   private final OtpCodeRepository otpCodeRepository;
   private final JwtService jwtService;
   private final PasswordEncoder passwordEncoder;
+  private final KafkaTemplate<String, OtpNotificationEvent> kafkaTemplate;
 
   @Value("${tenga.jwt.refresh-token-expiry}")
   private long refreshTokenExpirySeconds;
+
+  @Value("${tenga.kafka.topics.otp}")
+  private String otpTopic;
 
   public AuthServiceImpl(
       AuthUserRepository authUserRepository,
       RefreshTokenRepository refreshTokenRepository,
       OtpCodeRepository otpCodeRepository,
       JwtService jwtService,
-      PasswordEncoder passwordEncoder) {
+      PasswordEncoder passwordEncoder,
+      KafkaTemplate<String, OtpNotificationEvent> kafkaTemplate) {
     this.authUserRepository = authUserRepository;
     this.refreshTokenRepository = refreshTokenRepository;
     this.otpCodeRepository = otpCodeRepository;
     this.jwtService = jwtService;
     this.passwordEncoder = passwordEncoder;
+    this.kafkaTemplate = kafkaTemplate;
   }
 
   @Override
@@ -207,7 +215,16 @@ public class AuthServiceImpl implements AuthService {
     OtpCode otp = new OtpCode(recipient, code, purpose, expiresAt);
     otpCodeRepository.save(otp);
 
-    // Notification dispatch happens via Kafka event (not implemented here yet)
+    UUID userId =
+        authUserRepository
+            .findByEmail(recipient)
+            .or(() -> authUserRepository.findByPhoneNumber(recipient))
+            .map(AuthUser::getId)
+            .orElse(null);
+
+    kafkaTemplate.send(
+        otpTopic, recipient, new OtpNotificationEvent(userId, recipient, code, purpose.name()));
+
     log.info("OTP generated for recipient={}, purpose={}", maskRecipient(recipient), purpose);
   }
 

@@ -115,6 +115,18 @@ tenga:
     secret: ${JWT_SECRET}
     access-token-expiry: ${JWT_ACCESS_EXPIRY:900}       # 15 minutes in seconds
     refresh-token-expiry: ${JWT_REFRESH_EXPIRY:604800}  # 7 days in seconds
+  kafka:
+    topics:
+      otp: tenga.notifications.otp
+  notification:
+    sms-provider: ${SMS_PROVIDER:africas-talking}
+    africas-talking:
+      api-key: ${AT_API_KEY}
+      username: ${AT_USERNAME:tenga}
+      sender-id: ${AT_SENDER_ID:TENGA}
+    email:
+      from-address: ${MAIL_FROM_ADDRESS:noreply@tenga.co.zw}
+      from-name: ${MAIL_FROM_NAME:Tenga}
   s3:
     bucket: ${S3_BUCKET}
     access-key: ${S3_ACCESS_KEY}
