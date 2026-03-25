@@ -1,0 +1,43 @@
+# IDE
+.idea/
+*.iml
+.vscode/
+*.code-workspace
+.DS_Store
+
+# Gradle
+.gradle/
+backend/build/
+backend/bin/
+backend/.gradle/
+
+# Node
+web/node_modules/
+web/dist/
+web/.vite/
+web/coverage/
+
+# Flutter / Dart
+mobile/.dart_tool/
+mobile/build/
+mobile/.flutter-plugins
+mobile/.flutter-plugins-dependencies
+mobile/pubspec.lock
+
+# Environment / Secrets — NEVER commit these
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+secrets/
+
+# Logs
+*.log
+logs/
+
+# OS
+Thumbs.db
+
+# Docker volumes (if ever generated locally)
+infra/volumes/
