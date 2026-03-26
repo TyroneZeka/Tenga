@@ -15,6 +15,16 @@ export interface VerifyOtpRequest {
   otp: string
 }
 
+/** Matches backend AuthTokenResponse */
+export interface LoginResponse {
+  accessToken: string
+  tokenType: string
+  expiresIn: number
+  role: string
+  userId: string
+}
+
+/** Used after OTP verify (future enhancement) */
 export interface AuthResponse {
   accessToken: string
   user: {

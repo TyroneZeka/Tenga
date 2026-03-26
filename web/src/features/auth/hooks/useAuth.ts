@@ -16,11 +16,14 @@ export function useRegister() {
 
 export function useLogin() {
   const navigate = useNavigate()
+  const setToken = useAuthStore((s) => s.setToken)
+  const setUser = useAuthStore((s) => s.setUser)
   return useMutation({
     mutationFn: (data: LoginRequest) => authApi.login(data),
-    onSuccess: (_data, variables) => {
-      // Backend may require OTP verification on first login
-      navigate('/verify-otp', { state: { phone: variables.phone } })
+    onSuccess: (data, variables) => {
+      setToken(data.accessToken)
+      setUser({ id: data.userId, phone: variables.phone, email: null, displayName: 'User' })
+      navigate('/')
     },
   })
 }
