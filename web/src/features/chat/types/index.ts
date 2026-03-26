@@ -7,6 +7,8 @@ export interface ChatThread {
   lastMessagePreview: string | null
   unreadCount: number
   updatedAt: string
+  listingTitle: string | null
+  listingFirstImageUrl: string | null
 }
 
 /** Matches backend ChatMessageResponse */

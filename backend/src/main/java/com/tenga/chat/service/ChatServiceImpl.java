@@ -13,8 +13,14 @@ import com.tenga.chat.model.entity.ChatThread;
 import com.tenga.chat.model.mapper.ChatMapper;
 import com.tenga.chat.repository.ChatMessageRepository;
 import com.tenga.chat.repository.ChatThreadRepository;
+import com.tenga.listing.model.entity.Listing;
+import com.tenga.listing.model.entity.ListingImage;
+import com.tenga.listing.repository.ListingRepository;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.PageRequest;
@@ -32,16 +38,19 @@ public class ChatServiceImpl implements ChatService {
   private final ChatMessageRepository messageRepository;
   private final ChatMapper chatMapper;
   private final SimpMessagingTemplate messagingTemplate;
+  private final ListingRepository listingRepository;
 
   public ChatServiceImpl(
       ChatThreadRepository threadRepository,
       ChatMessageRepository messageRepository,
       ChatMapper chatMapper,
-      SimpMessagingTemplate messagingTemplate) {
+      SimpMessagingTemplate messagingTemplate,
+      ListingRepository listingRepository) {
     this.threadRepository = threadRepository;
     this.messageRepository = messageRepository;
     this.chatMapper = chatMapper;
     this.messagingTemplate = messagingTemplate;
+    this.listingRepository = listingRepository;
   }
 
   @Override
@@ -54,14 +63,20 @@ public class ChatServiceImpl implements ChatService {
                 () ->
                     threadRepository.save(
                         new ChatThread(buyerId, request.sellerId(), request.listingId())));
-    return chatMapper.toThreadResponse(thread, buyerId);
+    Listing listing = listingRepository.findById(request.listingId()).orElse(null);
+    return buildThreadResponse(thread, buyerId, listing);
   }
 
   @Override
   @Transactional(readOnly = true)
   public List<ChatThreadResponse> getThreads(UUID userId) {
-    return threadRepository.findByParticipant(userId).stream()
-        .map(t -> chatMapper.toThreadResponse(t, userId))
+    List<ChatThread> threads = threadRepository.findByParticipant(userId);
+    List<UUID> listingIds = threads.stream().map(ChatThread::getListingId).distinct().toList();
+    Map<UUID, Listing> listingMap =
+        listingRepository.findAllById(listingIds).stream()
+            .collect(Collectors.toMap(Listing::getId, l -> l));
+    return threads.stream()
+        .map(t -> buildThreadResponse(t, userId, listingMap.get(t.getListingId())))
         .toList();
   }
 
@@ -117,7 +132,6 @@ public class ChatServiceImpl implements ChatService {
     assertParticipant(thread, userId);
 
     int limit = Math.min(pageSize, MAX_PAGE_SIZE);
-    // Fetch one extra to determine hasMore
     int fetchSize = limit + 1;
     PageRequest pageable = PageRequest.of(0, fetchSize);
 
@@ -149,6 +163,31 @@ public class ChatServiceImpl implements ChatService {
     messageRepository.saveAll(unread);
     thread.markReadBy(userId);
     threadRepository.save(thread);
+  }
+
+  private ChatThreadResponse buildThreadResponse(ChatThread thread, UUID userId, Listing listing) {
+    int unreadCount =
+        userId.equals(thread.getBuyerId())
+            ? thread.getBuyerUnreadCount()
+            : thread.getSellerUnreadCount();
+    String listingTitle = listing != null ? listing.getTitle() : null;
+    String listingFirstImageUrl =
+        listing != null && !listing.getImages().isEmpty()
+            ? listing.getImages().stream()
+                .min(Comparator.comparingInt(ListingImage::getSortOrder))
+                .map(ListingImage::getUrl)
+                .orElse(null)
+            : null;
+    return new ChatThreadResponse(
+        thread.getId(),
+        thread.getBuyerId(),
+        thread.getSellerId(),
+        thread.getListingId(),
+        thread.getLastMessagePreview(),
+        unreadCount,
+        thread.getUpdatedAt(),
+        listingTitle,
+        listingFirstImageUrl);
   }
 
   private void assertParticipant(ChatThread thread, UUID userId) {
