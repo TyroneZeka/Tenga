@@ -6,7 +6,8 @@ import { useRegister } from '@/features/auth'
 import { ZIMBABWE_PHONE_REGEX } from '@/lib/constants'
 
 const schema = z.object({
-  displayName: z.string().min(2, 'Name must be at least 2 characters'),
+  firstName: z.string().min(1, 'First name is required').max(50, 'First name is too long'),
+  lastName: z.string().min(1, 'Last name is required').max(50, 'Last name is too long'),
   phone: z
     .string()
     .min(1, 'Phone number is required')
@@ -39,7 +40,8 @@ export default function RegisterPage() {
   } = useForm<FormValues>({ resolver: zodResolver(schema) })
 
   function onSubmit(data: FormValues) {
-    mutate({ ...data, email: data.email || undefined })
+    const { firstName, lastName, ...rest } = data
+    mutate({ ...rest, displayName: `${firstName} ${lastName}`.trim(), email: data.email || undefined })
   }
 
   return (
@@ -52,14 +54,24 @@ export default function RegisterPage() {
           <p className="mb-6 text-sm text-gray-500">Join Zimbabwe's marketplace</p>
 
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-            <Field label="Your name" error={errors.displayName?.message}>
-              <input
-                {...register('displayName')}
-                className={inputCls(!!errors.displayName)}
-                placeholder="e.g. Tinashe Moyo"
-                autoComplete="name"
-              />
-            </Field>
+            <div className="grid grid-cols-2 gap-3">
+              <Field label="First name" error={errors.firstName?.message}>
+                <input
+                  {...register('firstName')}
+                  className={inputCls(!!errors.firstName)}
+                  placeholder="Tinashe"
+                  autoComplete="given-name"
+                />
+              </Field>
+              <Field label="Last name" error={errors.lastName?.message}>
+                <input
+                  {...register('lastName')}
+                  className={inputCls(!!errors.lastName)}
+                  placeholder="Moyo"
+                  autoComplete="family-name"
+                />
+              </Field>
+            </div>
 
             <Field
               label="Phone number"
