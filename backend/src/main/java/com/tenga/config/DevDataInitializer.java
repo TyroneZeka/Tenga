@@ -5,19 +5,21 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Profile;
+import org.springframework.core.annotation.Order;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 /**
- * Seeds a test user on dev startup so the frontend can be exercised without
- * going through the SMS/email OTP flow.
+ * Seeds a test user on dev startup so the frontend can be exercised without going through the
+ * SMS/email OTP flow.
  *
  * <pre>
  *   Phone: +263771234567
  *   Password: Test1234!
  * </pre>
  */
+@Order(1)
 @Component
 @Profile("dev")
 public class DevDataInitializer implements CommandLineRunner {
