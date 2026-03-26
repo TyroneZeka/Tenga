@@ -6,10 +6,11 @@ import java.util.UUID;
 
 /** WebSocket frame pushed to subscribers after a message is persisted. */
 public record OutboundChatMessage(
-    UUID messageId,
+    UUID id,
     UUID threadId,
     UUID senderId,
     MessageType type,
     String body,
     String imageUrl,
+    String status,
     Instant sentAt) {}

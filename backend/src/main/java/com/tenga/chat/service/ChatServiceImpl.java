@@ -97,6 +97,7 @@ public class ChatServiceImpl implements ChatService {
             message.getType(),
             message.getBody(),
             message.getImageUrl(),
+            "SENT",
             message.getCreatedAt());
     pushToUser(thread.getBuyerId(), outbound);
     pushToUser(thread.getSellerId(), outbound);
