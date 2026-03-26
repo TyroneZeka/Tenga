@@ -276,6 +276,23 @@ public class DevDataSeeder implements CommandLineRunner {
     "RESERVED"
   };
 
+  // ── Category → loremflickr keyword (for category-appropriate images) ──────────
+
+  private static final Map<String, String> IMAGE_KEYWORDS =
+      Map.ofEntries(
+          Map.entry(CAT_PHONES, "smartphone,phone"),
+          Map.entry(CAT_COMPUTERS, "laptop,computer"),
+          Map.entry(CAT_TVS, "television"),
+          Map.entry(CAT_CAMERAS, "camera"),
+          Map.entry(CAT_CARS, "car,automobile"),
+          Map.entry(CAT_MOTORCYCLES, "motorcycle"),
+          Map.entry(CAT_SPARE_PARTS, "car,engine"),
+          Map.entry(CAT_FURNITURE, "furniture,interior"),
+          Map.entry(CAT_CLOTHING, "fashion,clothing"),
+          Map.entry(CAT_HOME, "kitchen,appliance"),
+          Map.entry(CAT_SPORTS, "sport,fitness"),
+          Map.entry(CAT_AGRICULTURE, "farm,tractor"));
+
   // ── Network prefixes for Zimbabwean phone numbers ─────────────────────────────
 
   private static final String[] NETWORK_PREFIXES = {"77", "78", "71", "73"};
@@ -321,18 +338,28 @@ public class DevDataSeeder implements CommandLineRunner {
   @Override
   public void run(String... args) {
     Integer listingCount = jdbc.queryForObject("SELECT COUNT(*) FROM lst_listings", Integer.class);
-    if (listingCount != null && listingCount >= 500) {
-      log.info("[DEV] Seed data already present ({} listings) — skipping", listingCount);
+    Integer imageCount = jdbc.queryForObject("SELECT COUNT(*) FROM lst_listing_images", Integer.class);
+    if (listingCount != null && listingCount >= 500 && imageCount != null && imageCount > 0) {
+      log.info("[DEV] Seed data already present ({} listings, {} images) — skipping", listingCount, imageCount);
       return;
     }
 
     Faker faker = new Faker(Locale.ENGLISH);
     Random random = new Random(42); // fixed seed for reproducible data
 
-    List<UUID> userIds = seedUsers(faker, random);
-    seedListings(faker, random, userIds);
-
-    log.info("[DEV] Seeded {} users and {} listings", USER_COUNT, LISTING_COUNT);
+    if (listingCount == null || listingCount < 500) {
+      List<UUID> userIds = seedUsers(faker, random);
+      List<UUID> listingIds = seedListings(faker, random, userIds);
+      seedImages(listingIds, random);
+      log.info("[DEV] Seeded {} users, {} listings, and images", USER_COUNT, LISTING_COUNT);
+    } else {
+      // Listings exist but images are missing — seed images only
+      List<UUID> listingIds = jdbc.query(
+          "SELECT id FROM lst_listings ORDER BY created_at",
+          (rs, n) -> UUID.fromString(rs.getString("id")));
+      seedImages(listingIds, random);
+      log.info("[DEV] Seeded images for {} existing listings", listingIds.size());
+    }
   }
 
   // ── Step A: seed users ───────────────────────────────────────────────────────
@@ -370,12 +397,12 @@ public class DevDataSeeder implements CommandLineRunner {
           }
         });
 
-    // Batch insert usr_profiles
+    // Batch insert usr_profiles (with avatar_url)
     jdbc.batchUpdate(
         """
         INSERT INTO usr_profiles
-            (id, user_id, display_name, city, created_at, updated_at, version)
-        VALUES (?, ?, ?, ?, now(), now(), 0)
+            (id, user_id, display_name, city, avatar_url, created_at, updated_at, version)
+        VALUES (?, ?, ?, ?, ?, now(), now(), 0)
         """,
         new BatchPreparedStatementSetter() {
           @Override
@@ -385,6 +412,8 @@ public class DevDataSeeder implements CommandLineRunner {
             ps.setObject(2, profileRows.get(i)[1]);
             ps.setString(3, faker.name().fullName());
             ps.setString(4, city.city());
+            // lock=i+1 so each user gets a consistent, distinct portrait
+            ps.setString(5, "https://loremflickr.com/150/150/portrait?lock=" + (i + 1));
           }
 
           @Override
@@ -415,7 +444,7 @@ public class DevDataSeeder implements CommandLineRunner {
       boolean negotiable,
       Instant expiresAt) {}
 
-  private void seedListings(Faker faker, Random random, List<UUID> userIds) {
+  private List<UUID> seedListings(Faker faker, Random random, List<UUID> userIds) {
     List<ListingRow> rows = new ArrayList<>(LISTING_COUNT);
 
     for (int i = 0; i < LISTING_COUNT; i++) {
@@ -491,6 +520,59 @@ public class DevDataSeeder implements CommandLineRunner {
           @Override
           public int getBatchSize() {
             return LISTING_COUNT;
+          }
+        });
+
+    return rows.stream().map(ListingRow::id).toList();
+  }
+
+  // ── Step C: seed listing images ───────────────────────────────────────────────
+
+  private record ImageRow(UUID listingId, String categoryId, int imageIndex, int lockBase) {}
+
+  private void seedImages(List<UUID> listingIds, Random random) {
+    // Re-fetch categoryId per listing to pick the right keyword
+    List<Object[]> catRows = jdbc.query(
+        "SELECT id, category_id FROM lst_listings WHERE id = ANY(?)",
+        ps -> ps.setArray(1, ps.getConnection().createArrayOf("uuid",
+            listingIds.stream().map(UUID::toString).toArray())),
+        (rs, n) -> new Object[]{
+            UUID.fromString(rs.getString("id")),
+            rs.getString("category_id")});
+
+    List<ImageRow> imageRows = new ArrayList<>();
+    int lockCounter = 100; // start above avatar range (0-50)
+    for (Object[] row : catRows) {
+      UUID listingId = (UUID) row[0];
+      String catId = (String) row[1];
+      int imgCount = 1 + random.nextInt(3); // 1-3 images per listing
+      for (int j = 0; j < imgCount; j++) {
+        imageRows.add(new ImageRow(listingId, catId, j, lockCounter++));
+      }
+    }
+
+    jdbc.batchUpdate(
+        """
+        INSERT INTO lst_listing_images
+            (id, listing_id, storage_key, url, sort_order, created_at, updated_at, version)
+        VALUES (?, ?, ?, ?, ?, now(), now(), 0)
+        """,
+        new BatchPreparedStatementSetter() {
+          @Override
+          public void setValues(PreparedStatement ps, int i) throws SQLException {
+            ImageRow r = imageRows.get(i);
+            String keyword = IMAGE_KEYWORDS.getOrDefault(r.categoryId(), "product,item");
+            String url = "https://loremflickr.com/600/400/" + keyword + "?lock=" + r.lockBase();
+            ps.setObject(1, UUID.randomUUID());
+            ps.setObject(2, r.listingId());
+            ps.setString(3, "seed/listings/" + r.listingId() + "/image-" + r.imageIndex() + ".jpg");
+            ps.setString(4, url);
+            ps.setInt(5, r.imageIndex());
+          }
+
+          @Override
+          public int getBatchSize() {
+            return imageRows.size();
           }
         });
   }

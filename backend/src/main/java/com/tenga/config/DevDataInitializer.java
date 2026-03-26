@@ -71,13 +71,14 @@ public class DevDataInitializer implements CommandLineRunner {
     jdbc.update(
         """
         INSERT INTO usr_profiles (
-            id, user_id, display_name,
+            id, user_id, display_name, avatar_url,
             created_at, updated_at, version
-        ) VALUES (?, ?, ?, now(), now(), 0)
+        ) VALUES (?, ?, ?, ?, now(), now(), 0)
         """,
         UUID.randomUUID(),
         userId,
-        TEST_DISPLAY_NAME);
+        TEST_DISPLAY_NAME,
+        "https://loremflickr.com/150/150/portrait?lock=0");
 
     log.info("[DEV] Test user created — phone={}, password={}", TEST_PHONE, TEST_PASSWORD);
   }
