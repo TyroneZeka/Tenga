@@ -61,6 +61,10 @@ export const router = createBrowserRouter([
             path: '/checkout/:listingId',
             lazy: () => import('@/pages/CheckoutPage').then((m) => ({ Component: m.default })),
           },
+          {
+            path: '/orders',
+            lazy: () => import('@/pages/OrdersPage').then((m) => ({ Component: m.default })),
+          },
         ],
       },
     ],
