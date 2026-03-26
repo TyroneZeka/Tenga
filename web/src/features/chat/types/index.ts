@@ -1,35 +1,34 @@
+/** Matches backend ChatThreadResponse */
 export interface ChatThread {
   id: string
-  listingId: string
-  listingTitle: string
-  listingImageUrl: string | null
   buyerId: string
-  buyerName: string
   sellerId: string
-  sellerName: string
+  listingId: string
   lastMessagePreview: string | null
   unreadCount: number
   updatedAt: string
 }
 
+/** Matches backend ChatMessageResponse */
 export interface ChatMessage {
   id: string
   threadId: string
   senderId: string
-  senderName: string
-  content: string
+  type: 'TEXT' | 'IMAGE'
+  body: string
   imageUrl: string | null
   status: 'SENT' | 'DELIVERED' | 'READ'
-  createdAt: string
+  sentAt: string
 }
 
+/** Matches backend MessageCursorPage */
 export interface MessagePage {
-  content: ChatMessage[]
-  hasMore: boolean
+  messages: ChatMessage[]
   nextCursor: string | null
+  hasMore: boolean
 }
 
 export interface SendMessageRequest {
-  content: string
+  body: string
   imageUrl?: string
 }

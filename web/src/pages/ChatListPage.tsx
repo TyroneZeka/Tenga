@@ -4,6 +4,10 @@ import { MessageCircle } from 'lucide-react'
 import { useThreads, useOpenThread } from '@/features/chat'
 import { useAuthStore } from '@/stores/authStore'
 
+function shortId(id: string) {
+  return id.slice(0, 8).toUpperCase()
+}
+
 export default function ChatListPage() {
   const { data: threads, isLoading } = useThreads()
   const user = useAuthStore((s) => s.user)
@@ -31,7 +35,7 @@ export default function ChatListPage() {
           </div>
         )}
 
-        {!isLoading && threads?.length === 0 && (
+        {!isLoading && (!threads || threads.length === 0) && (
           <div className="py-16 text-center text-gray-500">
             <MessageCircle className="mx-auto mb-2 h-8 w-8 text-gray-300" />
             <p>No conversations yet.</p>
@@ -41,10 +45,10 @@ export default function ChatListPage() {
         {threads && threads.length > 0 && (
           <div className="space-y-1">
             {threads.map((thread) => {
-              const other =
-                thread.buyerId === user?.id
-                  ? { name: thread.sellerName, id: thread.sellerId }
-                  : { name: thread.buyerName, id: thread.buyerId }
+              const isBuyer = thread.buyerId === user?.id
+              const otherId = isBuyer ? thread.sellerId : thread.buyerId
+              const label = isBuyer ? 'Seller' : 'Buyer'
+
               return (
                 <Link
                   key={thread.id}
@@ -52,18 +56,19 @@ export default function ChatListPage() {
                   className="flex items-center gap-3 rounded-xl bg-white p-4 shadow-sm hover:bg-gray-50"
                 >
                   <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-primary-100 font-medium text-primary-700">
-                    {other.name.charAt(0).toUpperCase()}
+                    {label.charAt(0)}
                   </div>
                   <div className="flex-1 overflow-hidden">
                     <div className="flex items-baseline justify-between">
-                      <p className="truncate text-sm font-medium text-gray-900">{other.name}</p>
+                      <p className="truncate text-sm font-medium text-gray-900">
+                        {label} · {shortId(otherId)}
+                      </p>
                       <span className="ml-2 flex-shrink-0 text-xs text-gray-400">
                         {new Date(thread.updatedAt).toLocaleDateString()}
                       </span>
                     </div>
                     <p className="truncate text-xs text-gray-500">
-                      {thread.listingTitle}
-                      {thread.lastMessagePreview && ` · ${thread.lastMessagePreview}`}
+                      {thread.lastMessagePreview ?? 'No messages yet'}
                     </p>
                   </div>
                   {thread.unreadCount > 0 && (

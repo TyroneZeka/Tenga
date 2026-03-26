@@ -1,7 +1,6 @@
-import { useParams } from 'react-router-dom'
+import { useParams, Link } from 'react-router-dom'
 import { useState, useEffect, useRef } from 'react'
 import { Send, ArrowLeft } from 'lucide-react'
-import { Link } from 'react-router-dom'
 import { useMessages, useSendMessage, useMarkRead, useChatSocket } from '@/features/chat'
 import type { ChatMessage } from '@/features/chat'
 import { useAuthStore } from '@/stores/authStore'
@@ -16,12 +15,11 @@ export default function ChatPage() {
   const [text, setText] = useState('')
   const bottomRef = useRef<HTMLDivElement>(null)
   const queryClient = useQueryClient()
-
-  // Extra messages pushed via WebSocket that haven't been fetched yet
-  const [extraMessages, setExtraMessages] = useState<ChatMessage[]>([])
   const markedReadRef = useRef(false)
 
-  const serverMessages = data?.content ?? []
+  const [extraMessages, setExtraMessages] = useState<ChatMessage[]>([])
+
+  const serverMessages = data?.messages ?? []
   const allMessages = [
     ...serverMessages,
     ...extraMessages.filter((e) => !serverMessages.some((s) => s.id === e.id)),
@@ -49,9 +47,9 @@ export default function ChatPage() {
   function handleSend(e: React.FormEvent) {
     e.preventDefault()
     if (!text.trim()) return
-    const content = text.trim()
+    const body = text.trim()
     setText('')
-    sendMessage({ content })
+    sendMessage({ body })
   }
 
   return (
@@ -63,7 +61,7 @@ export default function ChatPage() {
         <h1 className="text-base font-semibold text-gray-900">Chat</h1>
       </header>
 
-      <div className="flex-1 overflow-y-auto px-4 py-4 space-y-2">
+      <div className="flex-1 space-y-2 overflow-y-auto px-4 py-4">
         {isLoading && <p className="text-center text-sm text-gray-400">Loading…</p>}
         {allMessages.map((msg) => {
           const isMine = msg.senderId === user?.id
@@ -76,7 +74,7 @@ export default function ChatPage() {
                     : 'rounded-bl-sm bg-white text-gray-900 shadow-sm'
                 }`}
               >
-                {msg.content}
+                {msg.body}
               </div>
             </div>
           )
