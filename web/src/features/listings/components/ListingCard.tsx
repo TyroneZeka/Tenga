@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import { MapPin, Star } from 'lucide-react'
+import { MapPin } from 'lucide-react'
 import type { Listing } from '../types'
 
 interface ListingCardProps {
@@ -8,7 +8,7 @@ interface ListingCardProps {
 
 export function ListingCard({ listing }: ListingCardProps) {
   const currencyLabel = listing.currency === 'USD' ? 'US$' : 'ZiG'
-  const price = `${currencyLabel} ${listing.price.toLocaleString()}`
+  const price = `${currencyLabel} ${Number(listing.price).toLocaleString()}`
 
   return (
     <Link to={`/listings/${listing.id}`} className="group block">
@@ -21,7 +21,7 @@ export function ListingCard({ listing }: ListingCardProps) {
               className="h-full w-full object-cover transition group-hover:scale-105"
             />
           ) : (
-            <div className="flex h-full items-center justify-center text-gray-300 text-sm">
+            <div className="flex h-full items-center justify-center text-sm text-gray-300">
               No photo
             </div>
           )}
@@ -29,18 +29,13 @@ export function ListingCard({ listing }: ListingCardProps) {
         <div className="p-3">
           <p className="truncate text-sm font-medium text-gray-900">{listing.title}</p>
           <p className="mt-0.5 text-base font-semibold text-primary-600">{price}</p>
-          <div className="mt-1 flex items-center justify-between text-xs text-gray-500">
-            <span className="flex items-center gap-0.5">
+          {listing.city && (
+            <div className="mt-1 flex items-center gap-0.5 text-xs text-gray-500">
               <MapPin className="h-3 w-3" />
-              {listing.cityName}
-            </span>
-            {listing.seller.trustScore !== null && (
-              <span className="flex items-center gap-0.5">
-                <Star className="h-3 w-3 fill-amber-400 text-amber-400" />
-                {listing.seller.trustScore.toFixed(1)}
-              </span>
-            )}
-          </div>
+              {listing.city}
+              {listing.suburb && `, ${listing.suburb}`}
+            </div>
+          )}
         </div>
       </div>
     </Link>

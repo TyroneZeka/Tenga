@@ -10,16 +10,18 @@ const listing: Listing = {
   price: 350,
   currency: 'USD',
   condition: 'GOOD',
-  categoryId: 'electronics',
-  categoryName: 'Electronics',
-  cityId: 'harare',
-  cityName: 'Harare',
-  latitude: -17.82,
-  longitude: 31.05,
-  imageUrls: [],
-  seller: { id: 's1', displayName: 'Alice', avatarUrl: null, trustScore: 4.5 },
   status: 'ACTIVE',
+  sellerId: 's1',
+  categoryId: '00000000-0000-0000-0002-000000000001',
+  categoryName: 'Electronics',
+  city: 'Harare',
+  suburb: 'Avondale',
+  negotiable: false,
+  viewCount: 12,
+  imageUrls: [],
+  expiresAt: null,
   createdAt: '2026-03-01T10:00:00Z',
+  updatedAt: '2026-03-01T10:00:00Z',
 }
 
 function renderCard(overrides: Partial<Listing> = {}) {
@@ -41,14 +43,14 @@ it('renders ZiG currency correctly', () => {
   expect(screen.getByText('ZiG 450')).toBeInTheDocument()
 })
 
-it('renders city name', () => {
+it('renders city and suburb', () => {
   renderCard()
-  expect(screen.getByText('Harare')).toBeInTheDocument()
+  expect(screen.getByText('Harare, Avondale')).toBeInTheDocument()
 })
 
-it('renders trust score', () => {
-  renderCard()
-  expect(screen.getByText('4.5')).toBeInTheDocument()
+it('renders city only when no suburb', () => {
+  renderCard({ suburb: null })
+  expect(screen.getByText('Harare')).toBeInTheDocument()
 })
 
 it('shows "No photo" placeholder when no images', () => {

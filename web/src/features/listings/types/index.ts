@@ -1,5 +1,6 @@
 import type { Currency, Condition } from '@/lib/constants'
 
+/** Matches backend ListingResponse record exactly */
 export interface Listing {
   id: string
   title: string
@@ -7,21 +8,18 @@ export interface Listing {
   price: number
   currency: Currency
   condition: Condition
+  status: 'DRAFT' | 'ACTIVE' | 'RESERVED' | 'SOLD' | 'EXPIRED' | 'REMOVED'
+  sellerId: string
   categoryId: string
   categoryName: string
-  cityId: string
-  cityName: string
-  latitude: number | null
-  longitude: number | null
+  city: string | null
+  suburb: string | null
+  negotiable: boolean
+  viewCount: number
   imageUrls: string[]
-  seller: {
-    id: string
-    displayName: string
-    avatarUrl: string | null
-    trustScore: number | null
-  }
-  status: 'ACTIVE' | 'RESERVED' | 'SOLD' | 'INACTIVE'
+  expiresAt: string | null
   createdAt: string
+  updatedAt: string
 }
 
 /** Matches Spring's Page<T> JSON serialization */

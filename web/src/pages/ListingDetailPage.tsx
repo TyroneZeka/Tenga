@@ -1,5 +1,5 @@
 import { useParams, Link, useNavigate } from 'react-router-dom'
-import { MapPin, Star, MessageCircle, ArrowLeft, Edit } from 'lucide-react'
+import { MapPin, MessageCircle, ArrowLeft, Edit } from 'lucide-react'
 import { useListing, useDeleteListing } from '@/features/listings'
 import { useAuthStore } from '@/stores/authStore'
 
@@ -24,7 +24,7 @@ export default function ListingDetailPage() {
 
   if (!listing) return null
 
-  const isOwner = user?.id === listing.seller.id
+  const isOwner = user?.id === listing.sellerId
   const currencyLabel = listing.currency === 'USD' ? 'US$' : 'ZiG'
 
   function handleDelete() {
@@ -55,7 +55,7 @@ export default function ListingDetailPage() {
             <div>
               <h1 className="text-xl font-semibold text-gray-900">{listing.title}</h1>
               <p className="mt-1 text-2xl font-bold text-primary-600">
-                {currencyLabel} {listing.price.toLocaleString()}
+                {currencyLabel} {Number(listing.price).toLocaleString()}
               </p>
             </div>
             {isOwner && (
@@ -77,38 +77,40 @@ export default function ListingDetailPage() {
           </div>
 
           <div className="mt-3 flex flex-wrap gap-3 text-sm text-gray-600">
-            <span className="flex items-center gap-1">
-              <MapPin className="h-3.5 w-3.5" /> {listing.cityName}
-            </span>
+            {listing.city && (
+              <span className="flex items-center gap-1">
+                <MapPin className="h-3.5 w-3.5" />
+                {listing.city}
+                {listing.suburb && `, ${listing.suburb}`}
+              </span>
+            )}
             <span className="rounded-full bg-gray-100 px-2.5 py-0.5 capitalize">
               {listing.condition.toLowerCase().replace('_', ' ')}
             </span>
             <span className="rounded-full bg-gray-100 px-2.5 py-0.5">{listing.categoryName}</span>
+            {listing.negotiable && (
+              <span className="rounded-full bg-green-50 px-2.5 py-0.5 text-green-700">Negotiable</span>
+            )}
           </div>
 
           <p className="mt-4 text-sm leading-relaxed text-gray-700">{listing.description}</p>
 
           <div className="mt-5 border-t border-gray-100 pt-4">
             <div className="flex items-center justify-between">
-              <Link to={`/users/${listing.seller.id}`} className="flex items-center gap-2 hover:underline">
+              <Link
+                to={`/users/${listing.sellerId}`}
+                className="flex items-center gap-2 rounded-lg p-1 hover:bg-gray-50"
+              >
                 <div className="flex h-9 w-9 items-center justify-center rounded-full bg-primary-100 text-sm font-medium text-primary-700">
-                  {listing.seller.displayName.charAt(0).toUpperCase()}
+                  S
                 </div>
-                <div>
-                  <p className="text-sm font-medium text-gray-900">{listing.seller.displayName}</p>
-                  {listing.seller.trustScore !== null && (
-                    <p className="flex items-center gap-0.5 text-xs text-gray-500">
-                      <Star className="h-3 w-3 fill-amber-400 text-amber-400" />
-                      {listing.seller.trustScore.toFixed(1)}
-                    </p>
-                  )}
-                </div>
+                <span className="text-sm font-medium text-gray-900">View seller profile</span>
               </Link>
 
               {!isOwner && (
                 <div className="flex gap-2">
                   <Link
-                    to={`/chat?listingId=${listing.id}&sellerId=${listing.seller.id}`}
+                    to={`/chat?listingId=${listing.id}&sellerId=${listing.sellerId}`}
                     className="flex items-center gap-1.5 rounded-lg border border-gray-300 px-4 py-2 text-sm hover:bg-gray-50"
                   >
                     <MessageCircle className="h-4 w-4" /> Chat
