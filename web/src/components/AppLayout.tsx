@@ -37,7 +37,7 @@ function NavItem({ to, icon: Icon, label, badge, end }: NavItemProps) {
       end={end}
       className={({ isActive }) =>
         `relative flex flex-1 flex-col items-center justify-center gap-0.5 py-2 text-xs transition-colors ${
-          isActive ? 'text-primary-600' : 'text-gray-500 hover:text-gray-800'
+          isActive ? 'text-orange-500' : 'text-gray-500 hover:text-gray-800'
         }`
       }
     >
