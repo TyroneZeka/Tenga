@@ -43,7 +43,7 @@ export const router = createBrowserRouter([
           },
           {
             path: '/profile/me',
-            lazy: () => import('@/pages/EditProfilePage').then((m) => ({ Component: m.default })),
+            lazy: () => import('@/pages/ProfilePage').then((m) => ({ Component: m.default })),
           },
           {
             path: '/settings/profile',
