@@ -22,10 +22,10 @@ export async function sendMessage(
   threadId: string,
   data: SendMessageRequest,
 ): Promise<ChatMessage> {
-  const res = await api.post(`/chat/threads/${threadId}/messages`, data)
+  const res = await api.post(`/chat/threads/${threadId}/messages`, { ...data, type: 'TEXT' })
   return res.data
 }
 
 export async function markRead(threadId: string): Promise<void> {
-  await api.post(`/chat/threads/${threadId}/read`)
+  await api.patch(`/chat/threads/${threadId}/read`)
 }

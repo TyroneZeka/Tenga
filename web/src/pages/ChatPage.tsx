@@ -53,7 +53,7 @@ export default function ChatPage() {
   }
 
   return (
-    <div className="flex h-screen flex-col bg-gray-50">
+    <div className="flex h-[calc(100vh-4rem)] flex-col bg-gray-50">
       <header className="flex items-center gap-3 border-b border-gray-200 bg-white px-4 py-3">
         <Link to="/chat" className="text-gray-500 hover:text-gray-800">
           <ArrowLeft className="h-5 w-5" />

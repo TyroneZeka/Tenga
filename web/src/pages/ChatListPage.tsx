@@ -1,7 +1,7 @@
-import { Link, useSearchParams } from 'react-router-dom'
+import { Link, useSearchParams, useNavigate } from 'react-router-dom'
 import { useEffect } from 'react'
 import { MessageCircle } from 'lucide-react'
-import { useThreads, useOpenThread } from '@/features/chat'
+import { useThreads, useOpenThread, useThreadListSocket } from '@/features/chat'
 import { useAuthStore } from '@/stores/authStore'
 
 function shortId(id: string) {
@@ -9,6 +9,7 @@ function shortId(id: string) {
 }
 
 export default function ChatListPage() {
+  const navigate = useNavigate()
   const { data: threads, isLoading } = useThreads()
   const user = useAuthStore((s) => s.user)
   const { mutate: openThread } = useOpenThread()
@@ -16,14 +17,20 @@ export default function ChatListPage() {
   const listingId = searchParams.get('listingId')
   const sellerId = searchParams.get('sellerId')
 
+  // Keep thread list fresh when messages arrive in any thread
+  useThreadListSocket()
+
   useEffect(() => {
     if (listingId && sellerId) {
-      openThread({ listingId, sellerId })
+      openThread(
+        { listingId, sellerId },
+        { onSuccess: (thread) => navigate(`/chat/${thread.id}`, { replace: true }) },
+      )
     }
-  }, [listingId, sellerId, openThread])
+  }, [listingId, sellerId, openThread, navigate])
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 pb-20">
       <div className="mx-auto max-w-xl px-4 py-6">
         <h1 className="mb-4 text-xl font-semibold text-gray-900">Messages</h1>
 
@@ -55,9 +62,14 @@ export default function ChatListPage() {
                   to={`/chat/${thread.id}`}
                   className="flex items-center gap-3 rounded-xl bg-white p-4 shadow-sm hover:bg-gray-50"
                 >
-                  <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-primary-100 font-medium text-primary-700">
-                    {label.charAt(0)}
-                  </div>
+                  <img
+                    src={`https://loremflickr.com/40/40/portrait?lock=${otherId.slice(0, 8)}`}
+                    alt={label}
+                    className="h-10 w-10 flex-shrink-0 rounded-full object-cover"
+                    onError={(e) => {
+                      e.currentTarget.style.display = 'none'
+                    }}
+                  />
                   <div className="flex-1 overflow-hidden">
                     <div className="flex items-baseline justify-between">
                       <p className="truncate text-sm font-medium text-gray-900">
