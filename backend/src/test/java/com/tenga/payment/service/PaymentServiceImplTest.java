@@ -21,7 +21,6 @@ import com.tenga.payment.repository.TransactionRepository;
 import com.tenga.payment.repository.WalletRepository;
 import java.math.BigDecimal;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
@@ -47,7 +46,11 @@ class PaymentServiceImplTest {
   void setUp() {
     paymentService =
         new PaymentServiceImpl(
-            transactionRepository, walletRepository, paymentMapper, ecoCashGateway, innBucksGateway);
+            transactionRepository,
+            walletRepository,
+            paymentMapper,
+            ecoCashGateway,
+            innBucksGateway);
   }
 
   // ── initiatePayment ────────────────────────────────────────────────────────
@@ -252,11 +255,9 @@ class PaymentServiceImplTest {
 
   @Test
   void should_throwPaymentNotFoundException_when_gatewayReferenceIsUnknown() {
-    PaymentCallbackPayload payload =
-        new PaymentCallbackPayload("UNKNOWN-REF", "SUCCESS", null);
+    PaymentCallbackPayload payload = new PaymentCallbackPayload("UNKNOWN-REF", "SUCCESS", null);
 
-    when(transactionRepository.findByGatewayReference("UNKNOWN-REF"))
-        .thenReturn(Optional.empty());
+    when(transactionRepository.findByGatewayReference("UNKNOWN-REF")).thenReturn(Optional.empty());
 
     assertThatThrownBy(() -> paymentService.handleCallback(payload))
         .isInstanceOf(PaymentNotFoundException.class);

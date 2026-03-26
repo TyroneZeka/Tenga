@@ -16,6 +16,7 @@ import com.tenga.review.repository.ReviewRepository;
 import com.tenga.user.model.entity.UserProfile;
 import com.tenga.user.repository.UserProfileRepository;
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
@@ -28,8 +29,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.test.util.ReflectionTestUtils;
-
-import java.util.List;
 
 @ExtendWith(MockitoExtension.class)
 class ReviewServiceImplTest {
@@ -101,8 +100,7 @@ class ReviewServiceImplTest {
     CreateReviewRequest request =
         new CreateReviewRequest(transactionId, revieweeId, listingId, 3, "Decent");
 
-    Review savedReview =
-        new Review(revieweeId, reviewerId, transactionId, listingId, 3, "Decent");
+    Review savedReview = new Review(revieweeId, reviewerId, transactionId, listingId, 3, "Decent");
     ReflectionTestUtils.setField(savedReview, "id", UUID.randomUUID());
 
     when(reviewRepository.findByTransactionId(transactionId)).thenReturn(Optional.empty());
@@ -128,8 +126,7 @@ class ReviewServiceImplTest {
     CreateReviewRequest request =
         new CreateReviewRequest(transactionId, revieweeId, listingId, 4, "Good");
 
-    Review savedReview =
-        new Review(revieweeId, reviewerId, transactionId, listingId, 4, "Good");
+    Review savedReview = new Review(revieweeId, reviewerId, transactionId, listingId, 4, "Good");
     ReflectionTestUtils.setField(savedReview, "id", UUID.randomUUID());
 
     UserProfile profile = new UserProfile(revieweeId);
@@ -156,10 +153,12 @@ class ReviewServiceImplTest {
     PageRequest pageable = PageRequest.of(0, 10);
 
     Review r1 =
-        new Review(revieweeId, UUID.randomUUID(), UUID.randomUUID(), UUID.randomUUID(), 5, "Excellent!");
+        new Review(
+            revieweeId, UUID.randomUUID(), UUID.randomUUID(), UUID.randomUUID(), 5, "Excellent!");
     ReflectionTestUtils.setField(r1, "id", UUID.randomUUID());
     Review r2 =
-        new Review(revieweeId, UUID.randomUUID(), UUID.randomUUID(), UUID.randomUUID(), 4, "Very good");
+        new Review(
+            revieweeId, UUID.randomUUID(), UUID.randomUUID(), UUID.randomUUID(), 4, "Very good");
     ReflectionTestUtils.setField(r2, "id", UUID.randomUUID());
 
     Page<Review> reviewPage = new PageImpl<>(List.of(r1, r2), pageable, 2);

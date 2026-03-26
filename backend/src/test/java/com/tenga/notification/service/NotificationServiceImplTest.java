@@ -108,7 +108,9 @@ class NotificationServiceImplTest {
 
     ArgumentCaptor<Notification> captor = ArgumentCaptor.forClass(Notification.class);
     when(notificationRepository.save(captor.capture())).thenAnswer(inv -> inv.getArgument(0));
-    doThrow(new RuntimeException("SMTP connection refused")).when(emailService).send(any(), any(), any());
+    doThrow(new RuntimeException("SMTP connection refused"))
+        .when(emailService)
+        .send(any(), any(), any());
 
     notificationService.processOtpNotification(event);
 
@@ -123,7 +125,8 @@ class NotificationServiceImplTest {
     UUID notificationId = UUID.randomUUID();
 
     Notification notification =
-        new Notification(ownerId, null, NotificationChannel.IN_APP, "user@example.com", "Subject", "Body");
+        new Notification(
+            ownerId, null, NotificationChannel.IN_APP, "user@example.com", "Subject", "Body");
     ReflectionTestUtils.setField(notification, "id", notificationId);
 
     when(notificationRepository.findById(notificationId)).thenReturn(Optional.of(notification));

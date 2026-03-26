@@ -68,8 +68,7 @@ class LocationServiceImplTest {
   @Test
   void should_trimQuery_when_queryHasLeadingOrTrailingWhitespace() {
     City mutare = mock(City.class);
-    CityResponse dto =
-        new CityResponse(UUID.randomUUID(), "Mutare", "Manicaland", -18.97, 32.67);
+    CityResponse dto = new CityResponse(UUID.randomUUID(), "Mutare", "Manicaland", -18.97, 32.67);
 
     when(cityRepository.searchByName("Mutare")).thenReturn(List.of(mutare));
     when(locationMapper.toResponse(mutare)).thenReturn(dto);

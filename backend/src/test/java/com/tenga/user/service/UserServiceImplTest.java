@@ -73,7 +73,8 @@ class UserServiceImplTest {
     when(listingRepository.countBySellerIdAndStatusAndDeletedAtIsNull(eq(userId), any()))
         .thenReturn(0L);
 
-    UpdateProfileRequest request = new UpdateProfileRequest("Bob", "Seller of fine goods", "Harare", "Avenues");
+    UpdateProfileRequest request =
+        new UpdateProfileRequest("Bob", "Seller of fine goods", "Harare", "Avenues");
     UserProfileResponse response = userService.updateProfile(userId, request);
 
     assertThat(response.displayName()).isEqualTo("Bob");
