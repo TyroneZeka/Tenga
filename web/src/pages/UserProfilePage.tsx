@@ -43,10 +43,10 @@ export default function UserProfilePage() {
             )}
             <div>
               <h1 className="text-lg font-semibold text-gray-900">{profile.displayName}</h1>
-              {profile.trustScore !== null && (
+              {profile.trustScore != null && (
                 <p className="flex items-center gap-1 text-sm text-gray-500">
                   <Star className="h-3.5 w-3.5 fill-amber-400 text-amber-400" />
-                  {profile.trustScore.toFixed(1)} trust score
+                  {Number(profile.trustScore).toFixed(1)} trust score
                 </p>
               )}
               {profile.bio && <p className="mt-1 text-sm text-gray-600">{profile.bio}</p>}
