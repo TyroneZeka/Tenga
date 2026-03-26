@@ -24,14 +24,15 @@ export interface Listing {
   createdAt: string
 }
 
+/** Matches Spring's Page<T> JSON serialization */
 export interface ListingPage {
   content: Listing[]
-  page: {
-    number: number
-    size: number
-    totalElements: number
-    totalPages: number
-  }
+  totalElements: number
+  totalPages: number
+  number: number
+  size: number
+  first: boolean
+  last: boolean
 }
 
 export interface ListingSearchParams {

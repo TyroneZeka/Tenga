@@ -41,6 +41,6 @@ export async function uploadListingImages(id: string, files: File[]): Promise<st
 }
 
 export async function getUserListings(userId: string, page = 0): Promise<ListingPage> {
-  const res = await api.get(`/users/${userId}/listings`, { params: { page } })
+  const res = await api.get(`/users/${userId}/listings`, { params: { page, size: 20 } })
   return res.data
 }

@@ -66,20 +66,20 @@ export default function FeedPage() {
               <p className="py-16 text-center text-gray-500">No listings found.</p>
             )}
 
-            {data.page.totalPages > 1 && (
+            {data.totalPages > 1 && (
               <div className="mt-6 flex justify-center gap-2">
                 <button
-                  disabled={params.page === 0}
+                  disabled={data.first}
                   onClick={() => setParams((p) => ({ ...p, page: (p.page ?? 0) - 1 }))}
                   className="rounded-lg border border-gray-300 px-4 py-2 text-sm disabled:opacity-40"
                 >
                   Previous
                 </button>
                 <span className="flex items-center px-3 text-sm text-gray-600">
-                  {(params.page ?? 0) + 1} / {data.page.totalPages}
+                  {data.number + 1} / {data.totalPages}
                 </span>
                 <button
-                  disabled={(params.page ?? 0) + 1 >= data.page.totalPages}
+                  disabled={data.last}
                   onClick={() => setParams((p) => ({ ...p, page: (p.page ?? 0) + 1 }))}
                   className="rounded-lg border border-gray-300 px-4 py-2 text-sm disabled:opacity-40"
                 >
