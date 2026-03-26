@@ -36,7 +36,7 @@ export interface ListingPage {
 export interface ListingSearchParams {
   query?: string
   categoryId?: string
-  cityId?: string
+  city?: string
   condition?: Condition
   currency?: Currency
   minPrice?: number
