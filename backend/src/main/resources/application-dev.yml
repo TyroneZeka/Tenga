@@ -30,6 +30,11 @@ tenga:
     access-token-expiry: 3600   # 1 hour for easier local development
   notification:
     sms-provider: mock          # use MockSmsService in dev; emails go to MailPit on port 1025
+  payment:
+    ecocash:
+      mock: true
+    innbucks:
+      mock: true
   s3:
     bucket: tenga-dev
     access-key: minioadmin

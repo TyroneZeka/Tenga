@@ -84,6 +84,9 @@ dependencies {
     // Utilities
     implementation("com.google.guava:guava:33.3.1-jre")
 
+    // Dev data seeding (only activated via @Profile("dev"))
+    implementation("net.datafaker:datafaker:2.0.2")
+
     // Sentry
     implementation("io.sentry:sentry-spring-boot-starter-jakarta:7.14.0")
 

@@ -1,0 +1,160 @@
+import { useParams, Link, useNavigate } from 'react-router-dom'
+import { useState } from 'react'
+import { MapPin, MessageCircle, ArrowLeft, Edit } from 'lucide-react'
+import { useListing, useDeleteListing } from '@/features/listings'
+import { useAuthStore } from '@/stores/authStore'
+
+export default function ListingDetailPage() {
+  const { id } = useParams<{ id: string }>()
+  const { data: listing, isLoading } = useListing(id!)
+  const { mutate: deleteListing } = useDeleteListing()
+  const user = useAuthStore((s) => s.user)
+  const navigate = useNavigate()
+  const [activeImg, setActiveImg] = useState(0)
+
+  if (isLoading) {
+    return (
+      <div className="mx-auto max-w-3xl px-4 py-8">
+        <div className="animate-pulse space-y-4">
+          <div className="aspect-video rounded-xl bg-gray-200" />
+          <div className="h-6 w-2/3 rounded bg-gray-200" />
+          <div className="h-4 w-1/3 rounded bg-gray-200" />
+        </div>
+      </div>
+    )
+  }
+
+  if (!listing) return null
+
+  const isOwner = user?.id === listing.sellerId
+  const currencyLabel = listing.currency === 'USD' ? 'US$' : 'ZiG'
+
+  function handleDelete() {
+    if (!confirm('Delete this listing?')) return
+    deleteListing(listing!.id, { onSuccess: () => navigate('/') })
+  }
+
+  return (
+    <div className="min-h-screen bg-gray-50">
+      <div className="mx-auto max-w-3xl px-4 py-6">
+        <Link to="/" className="mb-4 flex items-center gap-1 text-sm text-gray-500 hover:text-gray-800">
+          <ArrowLeft className="h-4 w-4" /> Back
+        </Link>
+
+        {listing.imageUrls.length > 0 && (
+          <div className="mb-4 space-y-2">
+            <div className="overflow-hidden rounded-xl bg-gray-100">
+              <img
+                src={listing.imageUrls[activeImg]}
+                alt={listing.title}
+                className="h-72 w-full object-cover sm:h-96"
+              />
+            </div>
+            {listing.imageUrls.length > 1 && (
+              <div className="flex gap-2">
+                {listing.imageUrls.map((url, i) => (
+                  <button
+                    key={i}
+                    onClick={() => setActiveImg(i)}
+                    className={`h-16 w-16 flex-shrink-0 overflow-hidden rounded-lg border-2 transition ${
+                      i === activeImg ? 'border-primary-500' : 'border-transparent opacity-60 hover:opacity-100'
+                    }`}
+                  >
+                    <img src={url} alt="" className="h-full w-full object-cover" />
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
+        <div className="rounded-xl bg-white p-5 shadow-sm">
+          <div className="flex items-start justify-between gap-4">
+            <div>
+              <h1 className="text-xl font-semibold text-gray-900">{listing.title}</h1>
+              <p className="mt-1 text-2xl font-bold text-primary-600">
+                {currencyLabel} {Number(listing.price).toLocaleString()}
+              </p>
+            </div>
+            {isOwner && (
+              <div className="flex gap-2">
+                <Link
+                  to={`/listings/${listing.id}/edit`}
+                  className="flex items-center gap-1 rounded-lg border border-gray-300 px-3 py-1.5 text-sm hover:bg-gray-50"
+                >
+                  <Edit className="h-3.5 w-3.5" /> Edit
+                </Link>
+                <button
+                  onClick={handleDelete}
+                  className="rounded-lg border border-red-200 px-3 py-1.5 text-sm text-red-600 hover:bg-red-50"
+                >
+                  Delete
+                </button>
+              </div>
+            )}
+          </div>
+
+          <div className="mt-3 flex flex-wrap gap-3 text-sm text-gray-600">
+            {listing.city && (
+              <span className="flex items-center gap-1">
+                <MapPin className="h-3.5 w-3.5" />
+                {listing.city}
+                {listing.suburb && `, ${listing.suburb}`}
+              </span>
+            )}
+            <span className="rounded-full bg-gray-100 px-2.5 py-0.5 capitalize">
+              {listing.condition.toLowerCase().replace('_', ' ')}
+            </span>
+            <span className="rounded-full bg-gray-100 px-2.5 py-0.5">{listing.categoryName}</span>
+            {listing.negotiable && (
+              <span className="rounded-full bg-green-50 px-2.5 py-0.5 text-green-700">Negotiable</span>
+            )}
+          </div>
+
+          <p className="mt-4 text-sm leading-relaxed text-gray-700">{listing.description}</p>
+
+          <div className="mt-5 border-t border-gray-100 pt-4">
+            <div className="flex items-center justify-between">
+              <Link
+                to={`/users/${listing.sellerId}`}
+                className="flex items-center gap-2 rounded-lg p-1 hover:bg-gray-50"
+              >
+                <img
+                  src={`https://loremflickr.com/40/40/portrait?lock=${listing.sellerId.slice(0, 8)}`}
+                  alt="Seller"
+                  className="h-9 w-9 rounded-full object-cover"
+                  onError={(e) => {
+                    const el = e.currentTarget
+                    el.style.display = 'none'
+                    el.nextElementSibling?.removeAttribute('hidden')
+                  }}
+                />
+                <div hidden className="flex h-9 w-9 items-center justify-center rounded-full bg-primary-100 text-sm font-medium text-primary-700">
+                  S
+                </div>
+                <span className="text-sm font-medium text-gray-900">View seller profile</span>
+              </Link>
+
+              {!isOwner && (
+                <div className="flex gap-2">
+                  <Link
+                    to={`/chat?listingId=${listing.id}&sellerId=${listing.sellerId}`}
+                    className="flex items-center gap-1.5 rounded-lg border border-gray-300 px-4 py-2 text-sm hover:bg-gray-50"
+                  >
+                    <MessageCircle className="h-4 w-4" /> Chat
+                  </Link>
+                  <Link
+                    to={`/checkout/${listing.id}`}
+                    className="rounded-lg bg-primary-500 px-4 py-2 text-sm font-medium text-white hover:bg-primary-600"
+                  >
+                    Buy now
+                  </Link>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}

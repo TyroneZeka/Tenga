@@ -52,6 +52,21 @@ final class ListingSpecifications {
         predicates.add(cb.equal(cb.lower(root.get("city")), params.city().toLowerCase()));
       }
 
+      if (params.latitude() != null && params.longitude() != null) {
+        int radiusKm = (params.radiusKm() != null) ? Math.min(params.radiusKm(), 100) : 25;
+        double latDelta = radiusKm / 111.0;
+        double lngDelta = radiusKm / (111.0 * Math.cos(Math.toRadians(params.latitude())));
+        predicates.add(cb.isNotNull(root.get("latitude")));
+        predicates.add(
+            cb.between(
+                root.get("latitude"), params.latitude() - latDelta, params.latitude() + latDelta));
+        predicates.add(
+            cb.between(
+                root.get("longitude"),
+                params.longitude() - lngDelta,
+                params.longitude() + lngDelta));
+      }
+
       return cb.and(predicates.toArray(new Predicate[0]));
     };
   }
