@@ -1,2 +1,2 @@
 export { useInitiatePayment, useTransactions } from './hooks/usePayment'
-export type { Transaction, InitiatePaymentRequest, PaymentMethod } from './types'
+export type { Transaction, TransactionPage, InitiatePaymentRequest, PaymentMethod } from './types'

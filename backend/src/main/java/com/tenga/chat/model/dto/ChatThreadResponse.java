@@ -10,4 +10,6 @@ public record ChatThreadResponse(
     UUID listingId,
     String lastMessagePreview,
     int unreadCount,
-    Instant updatedAt) {}
+    Instant updatedAt,
+    String listingTitle,
+    String listingFirstImageUrl) {}

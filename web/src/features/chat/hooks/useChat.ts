@@ -58,11 +58,10 @@ export function useMarkRead(threadId: string) {
   })
 }
 
-export function useChatSocket(
-  threadId: string,
-  onMessage: (msg: ChatMessage) => void,
+function useStompSocket(
+  token: string | null,
+  onMessage: (raw: string) => void,
 ) {
-  const token = useAuthStore((s) => s.token)
   const clientRef = useRef<Client | null>(null)
   const onMessageRef = useRef(onMessage)
   useEffect(() => {
@@ -70,30 +69,41 @@ export function useChatSocket(
   })
 
   const connect = useCallback(() => {
-    if (!token || !threadId) return
-
+    if (!token) return
     const client = new Client({
       webSocketFactory: () => new SockJS('/ws/chat'),
       connectHeaders: { Authorization: `Bearer ${token}` },
       onConnect: () => {
-        client.subscribe(`/user/queue/messages`, (frame: IMessage) => {
-          const msg = JSON.parse(frame.body) as ChatMessage
-          if (msg.threadId === threadId) {
-            onMessageRef.current(msg)
-          }
+        client.subscribe('/user/queue/messages', (frame: IMessage) => {
+          onMessageRef.current(frame.body)
         })
       },
       reconnectDelay: 5000,
     })
-
     client.activate()
     clientRef.current = client
-  }, [token, threadId])
+  }, [token])
 
   useEffect(() => {
     connect()
-    return () => {
-      clientRef.current?.deactivate()
-    }
+    return () => { clientRef.current?.deactivate() }
   }, [connect])
+}
+
+/** Subscribe to real-time messages for a specific thread. */
+export function useChatSocket(threadId: string, onMessage: (msg: ChatMessage) => void) {
+  const token = useAuthStore((s) => s.token)
+  useStompSocket(token, (raw) => {
+    const msg = JSON.parse(raw) as ChatMessage
+    if (msg.threadId === threadId) onMessage(msg)
+  })
+}
+
+/** Keep the thread list fresh — invalidates on any incoming message. */
+export function useThreadListSocket() {
+  const token = useAuthStore((s) => s.token)
+  const queryClient = useQueryClient()
+  useStompSocket(token, () => {
+    queryClient.invalidateQueries({ queryKey: chatKeys.threads })
+  })
 }

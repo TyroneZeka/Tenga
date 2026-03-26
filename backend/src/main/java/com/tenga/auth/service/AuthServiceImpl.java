@@ -70,29 +70,20 @@ public class AuthServiceImpl implements AuthService {
     if (request.email() != null && authUserRepository.existsByEmail(request.email())) {
       throw new ConflictException("An account with this email already exists");
     }
-    if (request.phoneNumber() != null
-        && authUserRepository.existsByPhoneNumber(request.phoneNumber())) {
+    if (authUserRepository.existsByPhoneNumber(request.phone())) {
       throw new ConflictException("An account with this phone number already exists");
     }
 
     String passwordHash = passwordEncoder.encode(request.password());
     AuthUser user =
         new AuthUser(
-            request.email(),
-            request.phoneNumber(),
-            passwordHash,
-            UserRole.BUYER,
-            AuthProvider.LOCAL);
+            request.email(), request.phone(), passwordHash, UserRole.BUYER, AuthProvider.LOCAL);
 
     authUserRepository.save(user);
     log.info("New user registered: userId={}", user.getId());
 
-    // Trigger OTP for phone verification if phone provided
-    if (request.phoneNumber() != null) {
-      sendOtp(request.phoneNumber(), OtpPurpose.PHONE_VERIFICATION);
-    } else if (request.email() != null) {
-      sendOtp(request.email(), OtpPurpose.EMAIL_VERIFICATION);
-    }
+    // Trigger OTP for phone verification
+    sendOtp(request.phone(), OtpPurpose.PHONE_VERIFICATION);
   }
 
   @Override

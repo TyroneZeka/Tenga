@@ -55,7 +55,9 @@ export interface CreateListingRequest {
   currency: Currency
   condition: Condition
   categoryId: string
-  cityId: string
+  negotiable: boolean
+  city?: string
+  suburb?: string
   latitude?: number
   longitude?: number
 }

@@ -338,9 +338,13 @@ public class DevDataSeeder implements CommandLineRunner {
   @Override
   public void run(String... args) {
     Integer listingCount = jdbc.queryForObject("SELECT COUNT(*) FROM lst_listings", Integer.class);
-    Integer imageCount = jdbc.queryForObject("SELECT COUNT(*) FROM lst_listing_images", Integer.class);
+    Integer imageCount =
+        jdbc.queryForObject("SELECT COUNT(*) FROM lst_listing_images", Integer.class);
     if (listingCount != null && listingCount >= 500 && imageCount != null && imageCount > 0) {
-      log.info("[DEV] Seed data already present ({} listings, {} images) — skipping", listingCount, imageCount);
+      log.info(
+          "[DEV] Seed data already present ({} listings, {} images) — skipping",
+          listingCount,
+          imageCount);
       return;
     }
 
@@ -354,9 +358,10 @@ public class DevDataSeeder implements CommandLineRunner {
       log.info("[DEV] Seeded {} users, {} listings, and images", USER_COUNT, LISTING_COUNT);
     } else {
       // Listings exist but images are missing — seed images only
-      List<UUID> listingIds = jdbc.query(
-          "SELECT id FROM lst_listings ORDER BY created_at",
-          (rs, n) -> UUID.fromString(rs.getString("id")));
+      List<UUID> listingIds =
+          jdbc.query(
+              "SELECT id FROM lst_listings ORDER BY created_at",
+              (rs, n) -> UUID.fromString(rs.getString("id")));
       seedImages(listingIds, random);
       log.info("[DEV] Seeded images for {} existing listings", listingIds.size());
     }
@@ -532,13 +537,16 @@ public class DevDataSeeder implements CommandLineRunner {
 
   private void seedImages(List<UUID> listingIds, Random random) {
     // Re-fetch categoryId per listing to pick the right keyword
-    List<Object[]> catRows = jdbc.query(
-        "SELECT id, category_id FROM lst_listings WHERE id = ANY(?)",
-        ps -> ps.setArray(1, ps.getConnection().createArrayOf("uuid",
-            listingIds.stream().map(UUID::toString).toArray())),
-        (rs, n) -> new Object[]{
-            UUID.fromString(rs.getString("id")),
-            rs.getString("category_id")});
+    List<Object[]> catRows =
+        jdbc.query(
+            "SELECT id, category_id FROM lst_listings WHERE id = ANY(?)",
+            ps ->
+                ps.setArray(
+                    1,
+                    ps.getConnection()
+                        .createArrayOf("uuid", listingIds.stream().map(UUID::toString).toArray())),
+            (rs, n) ->
+                new Object[] {UUID.fromString(rs.getString("id")), rs.getString("category_id")});
 
     List<ImageRow> imageRows = new ArrayList<>();
     int lockCounter = 100; // start above avatar range (0-50)

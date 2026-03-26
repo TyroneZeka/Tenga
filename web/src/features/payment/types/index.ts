@@ -2,9 +2,12 @@ export type PaymentMethod = 'ECOCASH' | 'INNBUCKS'
 
 export interface InitiatePaymentRequest {
   listingId: string
-  method: PaymentMethod
+  sellerId: string
   amount: number
   currency: 'ZIG' | 'USD'
+  payerPhone: string
+  /** Routing only — not sent to backend; determines which endpoint to call */
+  method: PaymentMethod
 }
 
 export interface Transaction {
@@ -14,9 +17,19 @@ export interface Transaction {
   sellerId: string
   amount: number
   currency: 'ZIG' | 'USD'
-  method: PaymentMethod
+  paymentMethod: PaymentMethod
   status: 'PENDING' | 'PROCESSING' | 'COMPLETED' | 'FAILED' | 'REFUNDED'
   gatewayReference: string | null
   createdAt: string
-  updatedAt: string
+  completedAt: string | null
+}
+
+export interface TransactionPage {
+  content: Transaction[]
+  totalElements: number
+  totalPages: number
+  number: number
+  size: number
+  first: boolean
+  last: boolean
 }
