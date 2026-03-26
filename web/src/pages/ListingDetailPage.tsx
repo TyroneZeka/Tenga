@@ -1,4 +1,5 @@
 import { useParams, Link, useNavigate } from 'react-router-dom'
+import { useState } from 'react'
 import { MapPin, MessageCircle, ArrowLeft, Edit } from 'lucide-react'
 import { useListing, useDeleteListing } from '@/features/listings'
 import { useAuthStore } from '@/stores/authStore'
@@ -9,6 +10,7 @@ export default function ListingDetailPage() {
   const { mutate: deleteListing } = useDeleteListing()
   const user = useAuthStore((s) => s.user)
   const navigate = useNavigate()
+  const [activeImg, setActiveImg] = useState(0)
 
   if (isLoading) {
     return (
@@ -40,13 +42,29 @@ export default function ListingDetailPage() {
         </Link>
 
         {listing.imageUrls.length > 0 && (
-          <div className="mb-4 overflow-hidden rounded-xl">
-            <img
-              src={listing.imageUrls[0]}
-              alt={listing.title}
-              className="w-full object-cover"
-              style={{ maxHeight: 400 }}
-            />
+          <div className="mb-4 space-y-2">
+            <div className="overflow-hidden rounded-xl bg-gray-100">
+              <img
+                src={listing.imageUrls[activeImg]}
+                alt={listing.title}
+                className="h-72 w-full object-cover sm:h-96"
+              />
+            </div>
+            {listing.imageUrls.length > 1 && (
+              <div className="flex gap-2">
+                {listing.imageUrls.map((url, i) => (
+                  <button
+                    key={i}
+                    onClick={() => setActiveImg(i)}
+                    className={`h-16 w-16 flex-shrink-0 overflow-hidden rounded-lg border-2 transition ${
+                      i === activeImg ? 'border-primary-500' : 'border-transparent opacity-60 hover:opacity-100'
+                    }`}
+                  >
+                    <img src={url} alt="" className="h-full w-full object-cover" />
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
         )}
 
@@ -101,7 +119,17 @@ export default function ListingDetailPage() {
                 to={`/users/${listing.sellerId}`}
                 className="flex items-center gap-2 rounded-lg p-1 hover:bg-gray-50"
               >
-                <div className="flex h-9 w-9 items-center justify-center rounded-full bg-primary-100 text-sm font-medium text-primary-700">
+                <img
+                  src={`https://loremflickr.com/40/40/portrait?lock=${listing.sellerId.slice(0, 8)}`}
+                  alt="Seller"
+                  className="h-9 w-9 rounded-full object-cover"
+                  onError={(e) => {
+                    const el = e.currentTarget
+                    el.style.display = 'none'
+                    el.nextElementSibling?.removeAttribute('hidden')
+                  }}
+                />
+                <div hidden className="flex h-9 w-9 items-center justify-center rounded-full bg-primary-100 text-sm font-medium text-primary-700">
                   S
                 </div>
                 <span className="text-sm font-medium text-gray-900">View seller profile</span>
