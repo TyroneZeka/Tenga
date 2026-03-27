@@ -24,6 +24,7 @@ mixin _$ListingModel {
   String get id => throw _privateConstructorUsedError;
   String get title => throw _privateConstructorUsedError;
   String get description => throw _privateConstructorUsedError;
+  @JsonKey(fromJson: _toDouble)
   double get price => throw _privateConstructorUsedError;
   String get currency => throw _privateConstructorUsedError;
   String get condition => throw _privateConstructorUsedError;
@@ -61,7 +62,7 @@ abstract class $ListingModelCopyWith<$Res> {
     String id,
     String title,
     String description,
-    double price,
+    @JsonKey(fromJson: _toDouble) double price,
     String currency,
     String condition,
     String status,
@@ -206,7 +207,7 @@ abstract class _$$ListingModelImplCopyWith<$Res>
     String id,
     String title,
     String description,
-    double price,
+    @JsonKey(fromJson: _toDouble) double price,
     String currency,
     String condition,
     String status,
@@ -343,7 +344,7 @@ class _$ListingModelImpl implements _ListingModel {
     required this.id,
     required this.title,
     required this.description,
-    required this.price,
+    @JsonKey(fromJson: _toDouble) required this.price,
     required this.currency,
     required this.condition,
     required this.status,
@@ -370,6 +371,7 @@ class _$ListingModelImpl implements _ListingModel {
   @override
   final String description;
   @override
+  @JsonKey(fromJson: _toDouble)
   final double price;
   @override
   final String currency;
@@ -494,7 +496,7 @@ abstract class _ListingModel implements ListingModel {
     required final String id,
     required final String title,
     required final String description,
-    required final double price,
+    @JsonKey(fromJson: _toDouble) required final double price,
     required final String currency,
     required final String condition,
     required final String status,
@@ -521,6 +523,7 @@ abstract class _ListingModel implements ListingModel {
   @override
   String get description;
   @override
+  @JsonKey(fromJson: _toDouble)
   double get price;
   @override
   String get currency;

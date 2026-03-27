@@ -13,7 +13,7 @@ _$TransactionModelImpl _$$TransactionModelImplFromJson(
   listingId: json['listingId'] as String,
   buyerId: json['buyerId'] as String,
   sellerId: json['sellerId'] as String,
-  amount: (json['amount'] as num).toDouble(),
+  amount: _toDouble(json['amount']),
   currency: json['currency'] as String,
   paymentMethod: json['paymentMethod'] as String,
   status: json['status'] as String,

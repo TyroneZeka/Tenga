@@ -9,7 +9,8 @@ class ListingModel with _$ListingModel {
     required String id,
     required String title,
     required String description,
-    required double price,
+    // ignore: invalid_annotation_target
+    @JsonKey(fromJson: _toDouble) required double price,
     required String currency,
     required String condition,
     required String status,
@@ -30,6 +31,8 @@ class ListingModel with _$ListingModel {
       _$ListingModelFromJson(json);
 }
 
+double _toDouble(dynamic value) => (value as num).toDouble();
+
 class ListingPage {
   const ListingPage({required this.content, required this.meta});
 
@@ -41,7 +44,8 @@ class ListingPage {
       content: (json['content'] as List)
           .map((e) => ListingModel.fromJson(e as Map<String, dynamic>))
           .toList(),
-      meta: PageMeta.fromJson(json['page'] as Map<String, dynamic>),
+      // Spring Boot serialises Page<T> with pagination fields at the root level
+      meta: PageMeta.fromJson(json),
     );
   }
 }

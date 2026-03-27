@@ -11,7 +11,7 @@ _$ListingModelImpl _$$ListingModelImplFromJson(Map<String, dynamic> json) =>
       id: json['id'] as String,
       title: json['title'] as String,
       description: json['description'] as String,
-      price: (json['price'] as num).toDouble(),
+      price: _toDouble(json['price']),
       currency: json['currency'] as String,
       condition: json['condition'] as String,
       status: json['status'] as String,

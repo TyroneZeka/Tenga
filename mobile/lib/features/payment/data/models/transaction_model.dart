@@ -10,7 +10,8 @@ class TransactionModel with _$TransactionModel {
     required String listingId,
     required String buyerId,
     required String sellerId,
-    required double amount,
+    // ignore: invalid_annotation_target
+    @JsonKey(fromJson: _toDouble) required double amount,
     required String currency,
     required String paymentMethod,
     required String status,
@@ -22,3 +23,5 @@ class TransactionModel with _$TransactionModel {
   factory TransactionModel.fromJson(Map<String, dynamic> json) =>
       _$TransactionModelFromJson(json);
 }
+
+double _toDouble(dynamic value) => (value as num).toDouble();

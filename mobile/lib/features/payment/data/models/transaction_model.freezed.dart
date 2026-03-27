@@ -25,6 +25,7 @@ mixin _$TransactionModel {
   String get listingId => throw _privateConstructorUsedError;
   String get buyerId => throw _privateConstructorUsedError;
   String get sellerId => throw _privateConstructorUsedError;
+  @JsonKey(fromJson: _toDouble)
   double get amount => throw _privateConstructorUsedError;
   String get currency => throw _privateConstructorUsedError;
   String get paymentMethod => throw _privateConstructorUsedError;
@@ -55,7 +56,7 @@ abstract class $TransactionModelCopyWith<$Res> {
     String listingId,
     String buyerId,
     String sellerId,
-    double amount,
+    @JsonKey(fromJson: _toDouble) double amount,
     String currency,
     String paymentMethod,
     String status,
@@ -158,7 +159,7 @@ abstract class _$$TransactionModelImplCopyWith<$Res>
     String listingId,
     String buyerId,
     String sellerId,
-    double amount,
+    @JsonKey(fromJson: _toDouble) double amount,
     String currency,
     String paymentMethod,
     String status,
@@ -253,7 +254,7 @@ class _$TransactionModelImpl implements _TransactionModel {
     required this.listingId,
     required this.buyerId,
     required this.sellerId,
-    required this.amount,
+    @JsonKey(fromJson: _toDouble) required this.amount,
     required this.currency,
     required this.paymentMethod,
     required this.status,
@@ -274,6 +275,7 @@ class _$TransactionModelImpl implements _TransactionModel {
   @override
   final String sellerId;
   @override
+  @JsonKey(fromJson: _toDouble)
   final double amount;
   @override
   final String currency;
@@ -358,7 +360,7 @@ abstract class _TransactionModel implements TransactionModel {
     required final String listingId,
     required final String buyerId,
     required final String sellerId,
-    required final double amount,
+    @JsonKey(fromJson: _toDouble) required final double amount,
     required final String currency,
     required final String paymentMethod,
     required final String status,
@@ -379,6 +381,7 @@ abstract class _TransactionModel implements TransactionModel {
   @override
   String get sellerId;
   @override
+  @JsonKey(fromJson: _toDouble)
   double get amount;
   @override
   String get currency;
