@@ -116,20 +116,19 @@ flutter pub get      # first time only
 
 ### Run in browser (recommended on Windows)
 
-Due to a known Flutter/Chrome DDS issue on Windows, use `web-server` mode
-instead of `-d chrome`. It starts an HTTP server you open in any browser:
+Due to a known Flutter/Chrome DDS issue on Windows, always pass `--no-dds`:
+
+```bash
+flutter run -d chrome --no-dds
+```
+
+Hot reload (`r`), hot restart (`R`), and Flutter DevTools all work normally.
+
+Alternatively, use `web-server` mode and open the URL yourself:
 
 ```bash
 flutter run -d web-server --web-port 8090
-# Then open http://localhost:8090 in Chrome or Edge
-```
-
-Hot reload (`r`) and hot restart (`R`) still work — type them in the terminal.
-
-If you need Chrome DevTools integration (breakpoints etc.), run in profile mode:
-
-```bash
-flutter run -d chrome --profile
+# Then open http://localhost:8090 in any browser
 ```
 
 ### Run on Windows desktop
@@ -180,7 +179,7 @@ dart run build_runner build --delete-conflicting-outputs  # regenerate freezed m
 1. docker compose up -d          (infra)
 2. ./gradlew bootRun              (backend — wait for "Started TengaApplication")
 3. npm run dev                    (web)
-4. flutter run -d web-server --web-port 8090   (mobile — open http://localhost:8090)
+4. flutter run -d chrome --no-dds              (mobile — separate terminal)
 ```
 
 Each process needs its own terminal. Everything is hot-reload / hot-restart capable.
