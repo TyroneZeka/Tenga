@@ -14,6 +14,8 @@ import '../../features/chat/presentation/screens/chat_screen.dart';
 import '../../features/user/presentation/screens/profile_screen.dart';
 import '../../features/user/presentation/screens/edit_profile_screen.dart';
 import '../../features/payment/presentation/screens/orders_screen.dart';
+import '../../features/payment/presentation/screens/payment_screen.dart';
+import '../../features/review/presentation/screens/submit_review_screen.dart';
 import '../../features/user/presentation/screens/public_profile_screen.dart';
 import '../scaffold/scaffold_with_bottom_nav.dart';
 
@@ -105,6 +107,29 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: '/users/:id',
         builder: (context, state) =>
             PublicProfileScreen(userId: state.pathParameters['id']!),
+      ),
+      GoRoute(
+        path: '/payment',
+        builder: (context, state) {
+          final extra = state.extra as Map<String, dynamic>;
+          return PaymentScreen(
+            listingId: extra['listingId'] as String,
+            sellerId: extra['sellerId'] as String,
+            amount: (extra['amount'] as num).toDouble(),
+            currency: extra['currency'] as String,
+          );
+        },
+      ),
+      GoRoute(
+        path: '/review',
+        builder: (context, state) {
+          final extra = state.extra as Map<String, dynamic>;
+          return SubmitReviewScreen(
+            transactionId: extra['transactionId'] as String,
+            listingId: extra['listingId'] as String,
+            revieweeId: extra['revieweeId'] as String,
+          );
+        },
       ),
     ],
   );

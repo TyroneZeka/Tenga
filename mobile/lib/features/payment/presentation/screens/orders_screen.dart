@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import '../../data/datasources/payment_remote_datasource.dart';
 import '../../data/models/transaction_model.dart';
 import '../../../auth/presentation/providers/auth_provider.dart';
@@ -123,6 +124,37 @@ class _OrderCard extends StatelessWidget {
             Text(
               'Ref: ${tx.gatewayReference}',
               style: const TextStyle(fontSize: 11, color: AppTheme.textSecondary),
+            ),
+          ],
+          if (tx.status == 'COMPLETED' && isBuyer) ...[
+            const SizedBox(height: 12),
+            const Divider(height: 1),
+            const SizedBox(height: 10),
+            GestureDetector(
+              onTap: () => context.push(
+                '/review',
+                extra: {
+                  'transactionId': tx.id,
+                  'listingId': tx.listingId,
+                  'revieweeId': tx.sellerId,
+                },
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: const [
+                  Icon(Icons.star_border_rounded,
+                      size: 16, color: AppTheme.primary),
+                  SizedBox(width: 4),
+                  Text(
+                    'Leave a Review',
+                    style: TextStyle(
+                      fontSize: 13,
+                      color: AppTheme.primary,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ],
+              ),
             ),
           ],
         ],
