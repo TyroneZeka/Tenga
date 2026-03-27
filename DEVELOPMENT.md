@@ -1,6 +1,6 @@
 # Tenga — Local Development Guide
 
-How to start every part of the stack locally for development and testing.
+How to start the stack locally for development and testing.
 
 ---
 
@@ -114,10 +114,22 @@ cd mobile
 flutter pub get      # first time only
 ```
 
-### Run on Chrome (fastest for dev)
+### Run in browser (recommended on Windows)
+
+Due to a known Flutter/Chrome DDS issue on Windows, use `web-server` mode
+instead of `-d chrome`. It starts an HTTP server you open in any browser:
 
 ```bash
-flutter run -d chrome
+flutter run -d web-server --web-port 8090
+# Then open http://localhost:8090 in Chrome or Edge
+```
+
+Hot reload (`r`) and hot restart (`R`) still work — type them in the terminal.
+
+If you need Chrome DevTools integration (breakpoints etc.), run in profile mode:
+
+```bash
+flutter run -d chrome --profile
 ```
 
 ### Run on Windows desktop
@@ -135,12 +147,12 @@ flutter run           # auto-detects the running emulator
 ```
 
 The mobile app connects to the backend at `http://10.0.2.2:8080` (Android
-emulator's alias for localhost). For Chrome/Windows it uses `http://localhost:8080`.
+emulator's alias for localhost). For web-server/Windows it uses `http://localhost:8080`.
 
-To point at a different backend, pass it at build time:
+To point at a different backend:
 
 ```bash
-flutter run -d chrome --dart-define=BASE_URL=http://localhost:8080/api/v1
+flutter run -d web-server --web-port 8090 --dart-define=BASE_URL=http://localhost:8080/api/v1
 ```
 
 Other commands:
@@ -168,7 +180,7 @@ dart run build_runner build --delete-conflicting-outputs  # regenerate freezed m
 1. docker compose up -d          (infra)
 2. ./gradlew bootRun              (backend — wait for "Started TengaApplication")
 3. npm run dev                    (web)
-4. flutter run -d chrome          (mobile — separate terminal)
+4. flutter run -d web-server --web-port 8090   (mobile — open http://localhost:8090)
 ```
 
 Each process needs its own terminal. Everything is hot-reload / hot-restart capable.
