@@ -16,9 +16,9 @@ _$UserProfileModelImpl _$$UserProfileModelImplFromJson(
   avatarUrl: json['avatarUrl'] as String?,
   city: json['city'] as String?,
   suburb: json['suburb'] as String?,
-  activeListingCount: (json['activeListingCount'] as num).toInt(),
-  trustScore: (json['trustScore'] as num).toDouble(),
-  memberSince: json['memberSince'] as String,
+  activeListingCount: _toInt(json['activeListingCount']),
+  trustScore: _toDouble(json['trustScore']),
+  memberSince: json['memberSince'] as String?,
 );
 
 Map<String, dynamic> _$$UserProfileModelImplToJson(

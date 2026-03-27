@@ -27,10 +27,13 @@ mixin _$UserProfileModel {
   String? get bio => throw _privateConstructorUsedError;
   String? get avatarUrl => throw _privateConstructorUsedError;
   String? get city => throw _privateConstructorUsedError;
-  String? get suburb => throw _privateConstructorUsedError;
-  int get activeListingCount => throw _privateConstructorUsedError;
+  String? get suburb =>
+      throw _privateConstructorUsedError; // ignore: invalid_annotation_target
+  @JsonKey(fromJson: _toInt)
+  int get activeListingCount => throw _privateConstructorUsedError; // ignore: invalid_annotation_target
+  @JsonKey(fromJson: _toDouble)
   double get trustScore => throw _privateConstructorUsedError;
-  String get memberSince => throw _privateConstructorUsedError;
+  String? get memberSince => throw _privateConstructorUsedError;
 
   /// Serializes this UserProfileModel to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -57,9 +60,9 @@ abstract class $UserProfileModelCopyWith<$Res> {
     String? avatarUrl,
     String? city,
     String? suburb,
-    int activeListingCount,
-    double trustScore,
-    String memberSince,
+    @JsonKey(fromJson: _toInt) int activeListingCount,
+    @JsonKey(fromJson: _toDouble) double trustScore,
+    String? memberSince,
   });
 }
 
@@ -87,7 +90,7 @@ class _$UserProfileModelCopyWithImpl<$Res, $Val extends UserProfileModel>
     Object? suburb = freezed,
     Object? activeListingCount = null,
     Object? trustScore = null,
-    Object? memberSince = null,
+    Object? memberSince = freezed,
   }) {
     return _then(
       _value.copyWith(
@@ -127,10 +130,10 @@ class _$UserProfileModelCopyWithImpl<$Res, $Val extends UserProfileModel>
                 ? _value.trustScore
                 : trustScore // ignore: cast_nullable_to_non_nullable
                       as double,
-            memberSince: null == memberSince
+            memberSince: freezed == memberSince
                 ? _value.memberSince
                 : memberSince // ignore: cast_nullable_to_non_nullable
-                      as String,
+                      as String?,
           )
           as $Val,
     );
@@ -154,9 +157,9 @@ abstract class _$$UserProfileModelImplCopyWith<$Res>
     String? avatarUrl,
     String? city,
     String? suburb,
-    int activeListingCount,
-    double trustScore,
-    String memberSince,
+    @JsonKey(fromJson: _toInt) int activeListingCount,
+    @JsonKey(fromJson: _toDouble) double trustScore,
+    String? memberSince,
   });
 }
 
@@ -183,7 +186,7 @@ class __$$UserProfileModelImplCopyWithImpl<$Res>
     Object? suburb = freezed,
     Object? activeListingCount = null,
     Object? trustScore = null,
-    Object? memberSince = null,
+    Object? memberSince = freezed,
   }) {
     return _then(
       _$UserProfileModelImpl(
@@ -223,10 +226,10 @@ class __$$UserProfileModelImplCopyWithImpl<$Res>
             ? _value.trustScore
             : trustScore // ignore: cast_nullable_to_non_nullable
                   as double,
-        memberSince: null == memberSince
+        memberSince: freezed == memberSince
             ? _value.memberSince
             : memberSince // ignore: cast_nullable_to_non_nullable
-                  as String,
+                  as String?,
       ),
     );
   }
@@ -243,9 +246,9 @@ class _$UserProfileModelImpl implements _UserProfileModel {
     this.avatarUrl,
     this.city,
     this.suburb,
-    required this.activeListingCount,
-    required this.trustScore,
-    required this.memberSince,
+    @JsonKey(fromJson: _toInt) required this.activeListingCount,
+    @JsonKey(fromJson: _toDouble) required this.trustScore,
+    this.memberSince,
   });
 
   factory _$UserProfileModelImpl.fromJson(Map<String, dynamic> json) =>
@@ -265,12 +268,16 @@ class _$UserProfileModelImpl implements _UserProfileModel {
   final String? city;
   @override
   final String? suburb;
+  // ignore: invalid_annotation_target
   @override
+  @JsonKey(fromJson: _toInt)
   final int activeListingCount;
+  // ignore: invalid_annotation_target
   @override
+  @JsonKey(fromJson: _toDouble)
   final double trustScore;
   @override
-  final String memberSince;
+  final String? memberSince;
 
   @override
   String toString() {
@@ -341,9 +348,9 @@ abstract class _UserProfileModel implements UserProfileModel {
     final String? avatarUrl,
     final String? city,
     final String? suburb,
-    required final int activeListingCount,
-    required final double trustScore,
-    required final String memberSince,
+    @JsonKey(fromJson: _toInt) required final int activeListingCount,
+    @JsonKey(fromJson: _toDouble) required final double trustScore,
+    final String? memberSince,
   }) = _$UserProfileModelImpl;
 
   factory _UserProfileModel.fromJson(Map<String, dynamic> json) =
@@ -362,13 +369,15 @@ abstract class _UserProfileModel implements UserProfileModel {
   @override
   String? get city;
   @override
-  String? get suburb;
+  String? get suburb; // ignore: invalid_annotation_target
   @override
-  int get activeListingCount;
+  @JsonKey(fromJson: _toInt)
+  int get activeListingCount; // ignore: invalid_annotation_target
   @override
+  @JsonKey(fromJson: _toDouble)
   double get trustScore;
   @override
-  String get memberSince;
+  String? get memberSince;
 
   /// Create a copy of UserProfileModel
   /// with the given fields replaced by the non-null parameter values.

@@ -210,7 +210,8 @@ class ProfileScreen extends ConsumerWidget {
     );
   }
 
-  String _memberSince(String isoString) {
+  String _memberSince(String? isoString) {
+    if (isoString == null) return '—';
     try {
       return DateTime.parse(isoString).year.toString();
     } catch (_) {

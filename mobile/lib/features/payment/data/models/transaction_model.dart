@@ -10,7 +10,6 @@ class TransactionModel with _$TransactionModel {
     required String listingId,
     required String buyerId,
     required String sellerId,
-    // ignore: invalid_annotation_target
     @JsonKey(fromJson: _toDouble) required double amount,
     required String currency,
     required String paymentMethod,

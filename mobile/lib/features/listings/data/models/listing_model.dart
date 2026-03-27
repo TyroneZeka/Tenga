@@ -9,7 +9,6 @@ class ListingModel with _$ListingModel {
     required String id,
     required String title,
     required String description,
-    // ignore: invalid_annotation_target
     @JsonKey(fromJson: _toDouble) required double price,
     required String currency,
     required String condition,

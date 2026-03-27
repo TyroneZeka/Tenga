@@ -23,7 +23,8 @@ ListingModel _$ListingModelFromJson(Map<String, dynamic> json) {
 mixin _$ListingModel {
   String get id => throw _privateConstructorUsedError;
   String get title => throw _privateConstructorUsedError;
-  String get description => throw _privateConstructorUsedError;
+  String get description =>
+      throw _privateConstructorUsedError; // ignore: invalid_annotation_target
   @JsonKey(fromJson: _toDouble)
   double get price => throw _privateConstructorUsedError;
   String get currency => throw _privateConstructorUsedError;
@@ -370,6 +371,7 @@ class _$ListingModelImpl implements _ListingModel {
   final String title;
   @override
   final String description;
+  // ignore: invalid_annotation_target
   @override
   @JsonKey(fromJson: _toDouble)
   final double price;
@@ -521,7 +523,7 @@ abstract class _ListingModel implements ListingModel {
   @override
   String get title;
   @override
-  String get description;
+  String get description; // ignore: invalid_annotation_target
   @override
   @JsonKey(fromJson: _toDouble)
   double get price;
