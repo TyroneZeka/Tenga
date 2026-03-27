@@ -97,7 +97,7 @@ class ChatListScreen extends ConsumerWidget {
                         fontSize: 13, color: AppTheme.textSecondary),
                   ),
                   trailing: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
+                    mainAxisSize: MainAxisSize.min,
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
                       Text(
@@ -105,20 +105,26 @@ class ChatListScreen extends ConsumerWidget {
                         style: const TextStyle(
                             fontSize: 11, color: AppTheme.textSecondary),
                       ),
-                      if (thread.listingFirstImageUrl != null)
-                        Padding(
-                          padding: const EdgeInsets.only(top: 4),
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(4),
-                            child: Image.network(
-                              thread.listingFirstImageUrl!,
-                              width: 36,
-                              height: 36,
-                              fit: BoxFit.cover,
-                              errorBuilder: (_, __, ___) => const SizedBox(),
-                            ),
+                      if (thread.unreadCount > 0) ...[
+                        const SizedBox(height: 4),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 6, vertical: 2),
+                          decoration: BoxDecoration(
+                            color: AppTheme.primary,
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: Text(
+                            thread.unreadCount > 99
+                                ? '99+'
+                                : thread.unreadCount.toString(),
+                            style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 11,
+                                fontWeight: FontWeight.bold),
                           ),
                         ),
+                      ],
                     ],
                   ),
                   onTap: () => context.push('/chat/${thread.id}'),
