@@ -25,6 +25,15 @@ class ListingRemoteDataSource {
     return ListingPage.fromJson(response.data as Map<String, dynamic>);
   }
 
+  Future<ListingPage> getListingsByUser(String userId,
+      {int page = 0, int size = 20}) async {
+    final response = await _dio.get(
+      '/users/$userId/listings',
+      queryParameters: {'page': page, 'size': size},
+    );
+    return ListingPage.fromJson(response.data as Map<String, dynamic>);
+  }
+
   Future<ListingModel> getListingById(String id) async {
     final response = await _dio.get('/listings/$id');
     return ListingModel.fromJson(response.data as Map<String, dynamic>);

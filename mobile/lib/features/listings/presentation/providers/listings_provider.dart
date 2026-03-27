@@ -73,6 +73,39 @@ class ListingsNotifier
   }
 }
 
+final userListingsProvider = AsyncNotifierProvider.autoDispose
+    .family<UserListingsNotifier, List<ListingModel>, String>(
+  UserListingsNotifier.new,
+);
+
+class UserListingsNotifier
+    extends AutoDisposeFamilyAsyncNotifier<List<ListingModel>, String> {
+  int _page = 0;
+  bool _hasMore = true;
+
+  @override
+  Future<List<ListingModel>> build(String arg) async {
+    _page = 0;
+    _hasMore = true;
+    return _fetchPage();
+  }
+
+  Future<List<ListingModel>> _fetchPage() async {
+    final ds = ref.read(listingRemoteDataSourceProvider);
+    final result = await ds.getListingsByUser(arg, page: _page);
+    _hasMore = result.meta.number + 1 < result.meta.totalPages;
+    return result.content;
+  }
+
+  Future<void> loadMore() async {
+    if (!_hasMore || state is AsyncLoading) return;
+    final current = state.valueOrNull ?? [];
+    _page++;
+    final more = await _fetchPage();
+    state = AsyncData([...current, ...more]);
+  }
+}
+
 final listingDetailProvider = AsyncNotifierProvider.autoDispose
     .family<ListingDetailNotifier, ListingModel, String>(
   ListingDetailNotifier.new,

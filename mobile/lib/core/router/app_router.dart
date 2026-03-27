@@ -14,6 +14,7 @@ import '../../features/chat/presentation/screens/chat_screen.dart';
 import '../../features/user/presentation/screens/profile_screen.dart';
 import '../../features/user/presentation/screens/edit_profile_screen.dart';
 import '../../features/payment/presentation/screens/orders_screen.dart';
+import '../../features/user/presentation/screens/public_profile_screen.dart';
 import '../scaffold/scaffold_with_bottom_nav.dart';
 
 final routerProvider = Provider<GoRouter>((ref) {
@@ -99,6 +100,11 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/orders',
         builder: (context, state) => const OrdersScreen(),
+      ),
+      GoRoute(
+        path: '/users/:id',
+        builder: (context, state) =>
+            PublicProfileScreen(userId: state.pathParameters['id']!),
       ),
     ],
   );

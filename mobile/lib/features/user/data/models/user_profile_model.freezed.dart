@@ -27,10 +27,9 @@ mixin _$UserProfileModel {
   String? get bio => throw _privateConstructorUsedError;
   String? get avatarUrl => throw _privateConstructorUsedError;
   String? get city => throw _privateConstructorUsedError;
-  String? get suburb =>
-      throw _privateConstructorUsedError; // ignore: invalid_annotation_target
+  String? get suburb => throw _privateConstructorUsedError;
   @JsonKey(fromJson: _toInt)
-  int get activeListingCount => throw _privateConstructorUsedError; // ignore: invalid_annotation_target
+  int get activeListingCount => throw _privateConstructorUsedError;
   @JsonKey(fromJson: _toDouble)
   double get trustScore => throw _privateConstructorUsedError;
   String? get memberSince => throw _privateConstructorUsedError;
@@ -268,11 +267,9 @@ class _$UserProfileModelImpl implements _UserProfileModel {
   final String? city;
   @override
   final String? suburb;
-  // ignore: invalid_annotation_target
   @override
   @JsonKey(fromJson: _toInt)
   final int activeListingCount;
-  // ignore: invalid_annotation_target
   @override
   @JsonKey(fromJson: _toDouble)
   final double trustScore;
@@ -369,10 +366,10 @@ abstract class _UserProfileModel implements UserProfileModel {
   @override
   String? get city;
   @override
-  String? get suburb; // ignore: invalid_annotation_target
+  String? get suburb;
   @override
   @JsonKey(fromJson: _toInt)
-  int get activeListingCount; // ignore: invalid_annotation_target
+  int get activeListingCount;
   @override
   @JsonKey(fromJson: _toDouble)
   double get trustScore;

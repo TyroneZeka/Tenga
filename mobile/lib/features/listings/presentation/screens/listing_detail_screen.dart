@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../providers/listings_provider.dart';
+import '../../../chat/presentation/providers/chat_provider.dart';
+import '../../../user/presentation/providers/user_provider.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../shared/utils/currency_formatter.dart';
 
@@ -29,12 +31,14 @@ class ListingDetailScreen extends ConsumerWidget {
           body: CustomScrollView(
             slivers: [
               SliverAppBar(
-                expandedHeight: 320,
                 pinned: true,
                 backgroundColor: Colors.white,
-                foregroundColor: Colors.white,
-                flexibleSpace: FlexibleSpaceBar(
-                  background: _ImageCarousel(imageUrls: listing.imageUrls),
+                foregroundColor: AppTheme.textPrimary,
+              ),
+              SliverToBoxAdapter(
+                child: SizedBox(
+                  height: 320,
+                  child: _ImageCarousel(imageUrls: listing.imageUrls),
                 ),
               ),
               SliverToBoxAdapter(
@@ -74,24 +78,33 @@ class ListingDetailScreen extends ConsumerWidget {
                           ),
                           if (listing.negotiable) ...[
                             const SizedBox(width: 8),
-                            const _Badge(label: 'Negotiable', color: AppTheme.successGreen),
+                            const _Badge(
+                                label: 'Negotiable',
+                                color: AppTheme.successGreen),
                           ],
                           if (listing.city != null) ...[
                             const SizedBox(width: 8),
                             Row(
                               children: [
                                 const Icon(Icons.location_on_outlined,
-                                    size: 14, color: AppTheme.textSecondary),
+                                    size: 14,
+                                    color: AppTheme.textSecondary),
                                 Text(
                                   listing.city!,
                                   style: const TextStyle(
-                                      fontSize: 13, color: AppTheme.textSecondary),
+                                      fontSize: 13,
+                                      color: AppTheme.textSecondary),
                                 ),
                               ],
                             ),
                           ],
                         ],
                       ),
+                      const SizedBox(height: 20),
+                      const Divider(),
+                      const SizedBox(height: 16),
+                      // Seller section
+                      _SellerCard(sellerId: listing.sellerId),
                       const SizedBox(height: 20),
                       const Divider(),
                       const SizedBox(height: 16),
@@ -127,6 +140,120 @@ class ListingDetailScreen extends ConsumerWidget {
   }
 }
 
+class _SellerCard extends ConsumerWidget {
+  const _SellerCard({required this.sellerId});
+
+  final String sellerId;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final profileAsync = ref.watch(userProfileProvider(sellerId));
+
+    return GestureDetector(
+      onTap: () => context.push('/users/$sellerId'),
+      child: Container(
+        padding: const EdgeInsets.all(14),
+        decoration: BoxDecoration(
+          color: const Color(0xFFF9FAFB),
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: const Color(0xFFE5E7EB)),
+        ),
+        child: Row(
+          children: [
+            profileAsync.when(
+              loading: () => const CircleAvatar(
+                radius: 22,
+                backgroundColor: Color(0xFFE5E7EB),
+              ),
+              error: (_, __) => const CircleAvatar(
+                radius: 22,
+                backgroundColor: Color(0xFFE5E7EB),
+                child: Icon(Icons.person_outline,
+                    color: AppTheme.textSecondary),
+              ),
+              data: (profile) => CircleAvatar(
+                radius: 22,
+                backgroundColor: AppTheme.primary,
+                backgroundImage: profile.avatarUrl != null
+                    ? NetworkImage(profile.avatarUrl!)
+                    : null,
+                child: profile.avatarUrl == null
+                    ? Text(
+                        profile.displayName.isNotEmpty
+                            ? profile.displayName[0].toUpperCase()
+                            : '?',
+                        style: const TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold),
+                      )
+                    : null,
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: profileAsync.when(
+                loading: () => const _SkeletonText(),
+                error: (_, __) => const Text('Unknown seller'),
+                data: (profile) => Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      profile.displayName,
+                      style: const TextStyle(
+                          fontWeight: FontWeight.w600,
+                          fontSize: 14,
+                          color: AppTheme.textPrimary),
+                    ),
+                    const SizedBox(height: 2),
+                    Row(
+                      children: [
+                        const Icon(Icons.star,
+                            size: 13, color: Color(0xFFFBBF24)),
+                        const SizedBox(width: 3),
+                        Text(
+                          '${profile.trustScore.toStringAsFixed(1)} trust',
+                          style: const TextStyle(
+                              fontSize: 12,
+                              color: AppTheme.textSecondary),
+                        ),
+                        const SizedBox(width: 8),
+                        Text(
+                          '${profile.activeListingCount} listings',
+                          style: const TextStyle(
+                              fontSize: 12,
+                              color: AppTheme.textSecondary),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            const Icon(Icons.chevron_right,
+                color: AppTheme.textSecondary, size: 20),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _SkeletonText extends StatelessWidget {
+  const _SkeletonText();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 14,
+      width: 120,
+      decoration: BoxDecoration(
+        color: const Color(0xFFE5E7EB),
+        borderRadius: BorderRadius.circular(4),
+      ),
+    );
+  }
+}
+
 class _ImageCarousel extends StatefulWidget {
   const _ImageCarousel({required this.imageUrls});
 
@@ -145,7 +272,8 @@ class _ImageCarouselState extends State<_ImageCarousel> {
       return Container(
         color: const Color(0xFFF3F4F6),
         child: const Center(
-          child: Icon(Icons.image_outlined, size: 64, color: Color(0xFFD1D5DB)),
+          child: Icon(Icons.image_outlined,
+              size: 64, color: Color(0xFFD1D5DB)),
         ),
       );
     }
@@ -175,7 +303,9 @@ class _ImageCarouselState extends State<_ImageCarousel> {
                   height: 8,
                   margin: const EdgeInsets.symmetric(horizontal: 3),
                   decoration: BoxDecoration(
-                    color: i == _current ? AppTheme.primary : Colors.white60,
+                    color: i == _current
+                        ? AppTheme.primary
+                        : Colors.white60,
                     borderRadius: BorderRadius.circular(4),
                   ),
                 ),
@@ -187,7 +317,7 @@ class _ImageCarouselState extends State<_ImageCarousel> {
   }
 }
 
-class _ActionBar extends StatelessWidget {
+class _ActionBar extends ConsumerStatefulWidget {
   const _ActionBar({
     required this.listingId,
     required this.sellerId,
@@ -201,6 +331,34 @@ class _ActionBar extends StatelessWidget {
   final String currency;
 
   @override
+  ConsumerState<_ActionBar> createState() => _ActionBarState();
+}
+
+class _ActionBarState extends ConsumerState<_ActionBar> {
+  bool _openingChat = false;
+
+  Future<void> _openChat() async {
+    setState(() => _openingChat = true);
+    try {
+      final thread = await ref
+          .read(threadsProvider.notifier)
+          .getOrCreateThread(widget.listingId, widget.sellerId);
+      if (mounted) context.push('/chat/${thread.id}');
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Could not open chat: $e'),
+            backgroundColor: AppTheme.errorRed,
+          ),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _openingChat = false);
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.fromLTRB(16, 12, 16, 28),
@@ -212,11 +370,15 @@ class _ActionBar extends StatelessWidget {
         children: [
           Expanded(
             child: OutlinedButton.icon(
-              onPressed: () => context.push(
-                '/chat/new',
-                extra: {'listingId': listingId, 'sellerId': sellerId},
-              ),
-              icon: const Icon(Icons.chat_bubble_outline, size: 18),
+              onPressed: _openingChat ? null : _openChat,
+              icon: _openingChat
+                  ? const SizedBox(
+                      width: 16,
+                      height: 16,
+                      child: CircularProgressIndicator(
+                          strokeWidth: 2, color: AppTheme.primary),
+                    )
+                  : const Icon(Icons.chat_bubble_outline, size: 18),
               label: const Text('Chat'),
             ),
           ),
@@ -226,10 +388,10 @@ class _ActionBar extends StatelessWidget {
               onPressed: () => context.push(
                 '/payment',
                 extra: {
-                  'listingId': listingId,
-                  'sellerId': sellerId,
-                  'amount': price,
-                  'currency': currency,
+                  'listingId': widget.listingId,
+                  'sellerId': widget.sellerId,
+                  'amount': widget.price,
+                  'currency': widget.currency,
                 },
               ),
               icon: const Icon(Icons.payment, size: 18),

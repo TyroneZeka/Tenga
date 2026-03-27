@@ -24,8 +24,7 @@ mixin _$TransactionModel {
   String get id => throw _privateConstructorUsedError;
   String get listingId => throw _privateConstructorUsedError;
   String get buyerId => throw _privateConstructorUsedError;
-  String get sellerId =>
-      throw _privateConstructorUsedError; // ignore: invalid_annotation_target
+  String get sellerId => throw _privateConstructorUsedError;
   @JsonKey(fromJson: _toDouble)
   double get amount => throw _privateConstructorUsedError;
   String get currency => throw _privateConstructorUsedError;
@@ -275,7 +274,6 @@ class _$TransactionModelImpl implements _TransactionModel {
   final String buyerId;
   @override
   final String sellerId;
-  // ignore: invalid_annotation_target
   @override
   @JsonKey(fromJson: _toDouble)
   final double amount;
@@ -381,7 +379,7 @@ abstract class _TransactionModel implements TransactionModel {
   @override
   String get buyerId;
   @override
-  String get sellerId; // ignore: invalid_annotation_target
+  String get sellerId;
   @override
   @JsonKey(fromJson: _toDouble)
   double get amount;
