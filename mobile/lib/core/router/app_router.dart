@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import '../theme/app_theme.dart';
 import '../../features/auth/presentation/providers/auth_provider.dart';
 import '../../features/auth/presentation/screens/login_screen.dart';
 import '../../features/auth/presentation/screens/register_screen.dart';
@@ -21,14 +22,25 @@ final routerProvider = Provider<GoRouter>((ref) {
   return GoRouter(
     initialLocation: '/splash',
     redirect: (context, state) {
+      final location = state.matchedLocation;
+
+      // Still loading — stay on splash
+      if (authState is AsyncLoading) {
+        return location == '/splash' ? null : '/splash';
+      }
+
       final isLoggedIn = authState.valueOrNull?.isLoggedIn ?? false;
-      final isAuthRoute = state.matchedLocation == '/login' ||
-          state.matchedLocation == '/register' ||
-          state.matchedLocation == '/otp' ||
-          state.matchedLocation == '/splash';
+      final isAuthRoute = location == '/login' ||
+          location == '/register' ||
+          location == '/otp';
+
+      // Leave splash as soon as auth resolves
+      if (location == '/splash') {
+        return isLoggedIn ? '/' : '/login';
+      }
 
       if (!isLoggedIn && !isAuthRoute) return '/login';
-      if (isLoggedIn && state.matchedLocation == '/login') return '/';
+      if (isLoggedIn && isAuthRoute) return '/';
       return null;
     },
     routes: [
@@ -92,23 +104,63 @@ final routerProvider = Provider<GoRouter>((ref) {
   );
 });
 
-class _SplashScreen extends ConsumerWidget {
+class _SplashScreen extends StatelessWidget {
   const _SplashScreen();
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    ref.listen(authProvider, (previous, next) {
-      if (next is AsyncData) {
-        if (next.value!.isLoggedIn) {
-          context.go('/');
-        } else {
-          context.go('/login');
-        }
-      }
-    });
-
-    return const Scaffold(
-      body: Center(child: CircularProgressIndicator()),
+  Widget build(BuildContext context) {
+    // Navigation is driven entirely by the router redirect above.
+    // This screen just shows branding while authProvider initialises.
+    return Scaffold(
+      backgroundColor: AppTheme.darkSurface,
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              width: 88,
+              height: 88,
+              decoration: BoxDecoration(
+                color: AppTheme.primary,
+                borderRadius: BorderRadius.circular(24),
+              ),
+              child: const Icon(
+                Icons.shopping_bag_outlined,
+                color: Colors.white,
+                size: 48,
+              ),
+            ),
+            const SizedBox(height: 24),
+            const Text(
+              'Tenga',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 40,
+                fontWeight: FontWeight.bold,
+                letterSpacing: 1.5,
+              ),
+            ),
+            const SizedBox(height: 8),
+            const Text(
+              'Zimbabwe\'s marketplace',
+              style: TextStyle(
+                color: Colors.white54,
+                fontSize: 15,
+                letterSpacing: 0.5,
+              ),
+            ),
+            const SizedBox(height: 64),
+            const SizedBox(
+              width: 28,
+              height: 28,
+              child: CircularProgressIndicator(
+                strokeWidth: 2.5,
+                color: AppTheme.primary,
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
